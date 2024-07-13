@@ -35,8 +35,8 @@ namespace CFEventHandler.Email
                 Username = _username,
                 Password = _password,                
                 EmailCreatorId = _emailCreatorIdByEventTypeId[eventInstance.EventTypeId],
-                RecipientAddresses = new List<string>() { "chrisfellows90@gmail.com" },
-                SenderAddress = "chrismfellows@hotmail.co.uk"
+                RecipientAddresses = new List<string>() { "test@test.com" },
+                SenderAddress = "test@test.co.uk"
             };             
 
             return settings;
