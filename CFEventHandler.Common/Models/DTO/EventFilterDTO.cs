@@ -6,9 +6,14 @@
     public class EventFilterDTO
     {
         /// <summary>
-        /// Event types filter
+        /// Event types filter (if any)
         /// </summary>
         public List<string> EventTypeIds { get; set; }
+
+        /// <summary>
+        /// Event clients filter (if any)
+        /// </summary>
+        public List<string> EventClientIds { get; set; }
 
         /// <summary>
         /// Events created after date and time

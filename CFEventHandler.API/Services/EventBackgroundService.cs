@@ -1,4 +1,7 @@
-﻿using CFEventHandler.Interfaces;
+﻿using CFEventHandler.Hubs;
+using CFEventHandler.Interfaces;
+using Microsoft.AspNetCore.SignalR;
+using System.Diagnostics;
 
 namespace CFEventHandler.API.Services
 {
@@ -10,13 +13,17 @@ namespace CFEventHandler.API.Services
     public class EventBackgroundService : BackgroundService
     {
         private readonly IEventQueueService _eventQueueService;
-        private readonly IServiceProvider _serviceProvider;        
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IHubContext<NotificationHub> _hub;
 
         public EventBackgroundService(IEventQueueService eventQueueService,
+                                      IHubContext<NotificationHub> hub,
                                       IServiceProvider serviceProvider)
         {
             _eventQueueService = eventQueueService;
+            _hub = hub;
             _serviceProvider = serviceProvider;
+
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -27,6 +34,8 @@ namespace CFEventHandler.API.Services
                 eventManagerService = scope.ServiceProvider.GetService<IEventManagerService>();
             }
 
+            //var lastNotification = DateTimeOffset.UtcNow;
+
             // Process event queue until stopped
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -35,13 +44,36 @@ namespace CFEventHandler.API.Services
 
                 if (eventInstance != null)
                 {
+                    _hub.Clients.All.SendAsync("Status", $"Handling event {eventInstance.Id}").Wait();
                     eventManagerService.Handle(eventInstance);
+                    _hub.Clients.All.SendAsync("Status", $"Handled event {eventInstance.Id}").Wait();
                     await Task.Delay(1, stoppingToken);
                 }
                 else
                 {
                     await Task.Delay(50000, stoppingToken);
                 }
+
+                //if (lastNotification.AddSeconds(10) <= DateTimeOffset.UtcNow)
+                //{
+                //    lastNotification = DateTimeOffset.UtcNow;
+
+                //    var eventInstance2 = new CFEventHandler.Models.EventInstance()
+                //    {
+                //         Id = Guid.NewGuid().ToString(),
+                //         EventClientId = "1",
+                //         EventTypeId = "2",
+                //         Parameters = new List<Models.EventParameter>()
+                //         {
+                //             new Models.EventParameter() { Name = "P1", Value = 10 },
+                //             new Models.EventParameter() { Name = "P2", Value = "Param2" },
+                //         }
+                //    };
+                //    _hub.Clients.All.SendAsync("Event", eventInstance2).Wait();
+
+                //    //_hub.Clients.All.SendAsync("TestMessage", "Test message").Wait();
+                //    int xxx = 1000;
+                //}
             }            
         }        
     }

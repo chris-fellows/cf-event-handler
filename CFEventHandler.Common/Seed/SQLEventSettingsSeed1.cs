@@ -11,7 +11,7 @@ namespace CFEventHandler.Common.Seed
 
             settings.Add(new SQLEventSettings()
             {
-                Id = "1",
+                Id = "SQL1",
                 ConnectionString = ""
             });
 

@@ -13,8 +13,8 @@ namespace CFEventHandler.Common.Seed
             {
                 Id = "1",
                 EventTypeId = "1",                
-                EventHandlerId = "1",
-                EventSettingsId = "1",
+                EventHandlerId = "5",
+                EventSettingsId = "Email1",
                 Name = "Event handler rule 1"
             });
 
@@ -22,36 +22,9 @@ namespace CFEventHandler.Common.Seed
             {
                 Id = "2",
                 EventTypeId = "2",
-                EventHandlerId = "2",
-                EventSettingsId = "2",
-                Name = "Event handler rule 2"
-            });
-
-            eventHandlerRules.Add(new EventHandlerRule()
-            {
-                Id = "3",
-                EventTypeId = "3",
-                EventHandlerId = "3",
-                EventSettingsId = "3",
-                Name = "Event handler rule 3"
-            });
-
-            eventHandlerRules.Add(new EventHandlerRule()
-            {
-                Id = "4",
-                EventTypeId = "4",
-                EventHandlerId = "4",
-                EventSettingsId = "4",
-                Name = "Event handler rule 4"
-            });
-
-            eventHandlerRules.Add(new EventHandlerRule()
-            {
-                Id = "5",
-                EventTypeId = "5",
                 EventHandlerId = "5",
-                EventSettingsId = "5",
-                Name = "Event handler rule 5"
+                EventSettingsId = "Email2",
+                Name = "Event handler rule 2"
             });
 
             return eventHandlerRules;

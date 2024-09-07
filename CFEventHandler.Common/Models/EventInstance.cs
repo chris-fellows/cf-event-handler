@@ -16,6 +16,11 @@
         public string EventTypeId { get; set; } = String.Empty;
 
         /// <summary>
+        /// Client that created event
+        /// </summary>
+        public string EventClientId { get; set; } = String.Empty;
+
+        /// <summary>
         /// Time created
         /// </summary>
         public DateTimeOffset CreatedDateTime { get; set; } = DateTimeOffset.UtcNow;

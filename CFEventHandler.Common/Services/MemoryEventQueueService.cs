@@ -15,6 +15,8 @@ namespace CFEventHandler.Services
             _eventInstances.Enqueue(eventInstance);
         }
 
+        public int Count => _eventInstances.Count;
+
         public EventInstance? GetNext()
         {
             if (_eventInstances.Count == 0) return null;

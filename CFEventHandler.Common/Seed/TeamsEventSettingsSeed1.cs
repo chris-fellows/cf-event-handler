@@ -11,8 +11,8 @@ namespace CFEventHandler.Common.Seed
 
             settings.Add(new TeamsEventSettings()
             {
-                Id = "1",
-                URL = ""
+                Id = "Teams1",
+                URL = "https://www.google.co.uk"
             });
 
             return settings;

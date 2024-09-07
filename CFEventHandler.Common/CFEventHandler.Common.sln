@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35201.131
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFEventHandler.Common", "CFEventHandler.Common.csproj", "{FA9A0530-03D6-471F-B2CB-F16852DA9872}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CFEventHandler.Common", "CFEventHandler.Common.csproj", "{FA9A0530-03D6-471F-B2CB-F16852DA9872}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFEventHandler.API", "..\CFEventHandler.API\CFEventHandler.API.csproj", "{F0197377-2180-4AA2-BE1F-59FC4CB40597}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CFEventHandler.API", "..\CFEventHandler.API\CFEventHandler.API.csproj", "{F0197377-2180-4AA2-BE1F-59FC4CB40597}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFEventHandler.Notifications", "..\CFEventHandler.Notifications\CFEventHandler.Notifications.csproj", "{E3ADE7F8-E8EB-4562-AD8A-E8EDAEA925FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F0197377-2180-4AA2-BE1F-59FC4CB40597}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0197377-2180-4AA2-BE1F-59FC4CB40597}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0197377-2180-4AA2-BE1F-59FC4CB40597}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3ADE7F8-E8EB-4562-AD8A-E8EDAEA925FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3ADE7F8-E8EB-4562-AD8A-E8EDAEA925FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3ADE7F8-E8EB-4562-AD8A-E8EDAEA925FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3ADE7F8-E8EB-4562-AD8A-E8EDAEA925FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

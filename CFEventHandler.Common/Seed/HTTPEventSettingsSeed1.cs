@@ -11,7 +11,7 @@ namespace CFEventHandler.Common.Seed
 
             settings.Add(new HTTPEventSettings()
             {
-                Id = "1",
+                Id = "HTTP1",
                 Method = "POST",
                 Headers = new Dictionary<string, string>(),
                 URL = "http://myapi/dosomething"

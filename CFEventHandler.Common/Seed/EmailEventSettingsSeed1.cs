@@ -9,6 +9,18 @@ namespace CFEventHandler.Common.Seed
         {
             var settings = new List<EmailEventSettings>();
 
+            settings.Add(new EmailEventSettings()
+            {
+                Id = "Email1",
+                Name = "Email (Default)"
+            });
+
+            settings.Add(new EmailEventSettings()
+            {
+                Id = "Email2",
+                Name = "Email (2)"
+            });
+
             return settings;
         }
 

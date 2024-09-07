@@ -12,7 +12,8 @@ namespace CFEventHandler.Common.Seed
 
             settings.Add(new CSVEventSettings()
             {
-                Id = "1"                 
+                Id = "CSV1",
+                Name = "CSV (Default)"
             });
 
             return settings;

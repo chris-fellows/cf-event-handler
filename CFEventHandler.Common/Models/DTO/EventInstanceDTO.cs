@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CFEventHandler.Models.DTO
+﻿namespace CFEventHandler.Models.DTO
 {
     public class EventInstanceDTO
     { 
@@ -17,6 +11,11 @@ namespace CFEventHandler.Models.DTO
         /// Event type
         /// </summary>
         public string EventTypeId { get; set; } = String.Empty;
+
+        /// <summary>
+        /// Client that created event
+        /// </summary>
+        public string EventClientId { get; set; } = String.Empty;
 
         /// <summary>
         /// Time created

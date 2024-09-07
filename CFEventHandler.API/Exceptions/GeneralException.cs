@@ -2,6 +2,9 @@
 
 namespace CFEventHandler.API.Exceptions
 {
+    /// <summary>
+    /// General exception
+    /// </summary>
     public class GeneralException : Exception
     {
         public GeneralException()
