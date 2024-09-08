@@ -9,27 +9,27 @@ namespace CFEventHandler.Interfaces
         /// </summary>
         /// <param name="eventTypeList"></param>
         /// <returns></returns>
-        Task Import(IEntityList<EventType> eventTypeList);
+        Task ImportAsync(IEntityList<EventType> eventTypeList);
 
         /// <summary>
         /// Exports to list
         /// </summary>
         /// <param name="eventTypeList"></param>
         /// <returns></returns>
-        Task Export(IEntityList<EventType> eventTypeList);
+        Task ExportAsync(IEntityList<EventType> eventTypeList);
 
         /// <summary>
         /// Gets all
         /// </summary>
         /// <returns></returns>
-        Task<List<EventType>> GetAllAsync();
+        IEnumerable<EventType> GetAll();
 
         /// <summary>
         /// Gets event type by Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EventType> GetByIdAsync(string id);
+        Task<EventType?> GetByIdAsync(string id);
 
         /// <summary>
         /// Adds event type

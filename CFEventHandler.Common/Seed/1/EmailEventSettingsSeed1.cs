@@ -1,7 +1,7 @@
 ﻿using CFEventHandler.Email;
 using CFEventHandler.Interfaces;
 
-namespace CFEventHandler.Common.Seed
+namespace CFEventHandler.Seed
 {
     public class EmailEventSettingsSeed1 : IEntityList<EmailEventSettings>
     {

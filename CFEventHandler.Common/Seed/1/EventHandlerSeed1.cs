@@ -65,13 +65,27 @@ namespace CFEventHandler.Seed
             eventHandlers.Add(new EventHandler()
             {
                 Id = "8",
+                Name = "Process",
+                EventHandlerType = EventHandlerTypes.Process
+            });
+
+            eventHandlers.Add(new EventHandler()
+            {
+                Id = "9",
+                Name = "SMS",
+                EventHandlerType = EventHandlerTypes.SMS
+            });
+
+            eventHandlers.Add(new EventHandler()
+            {
+                Id = "10",
                 Name = "SQL database",
                 EventHandlerType = EventHandlerTypes.SQL
             });
 
             eventHandlers.Add(new EventHandler()
             {
-                Id = "9",
+                Id = "11",
                 Name = "Teams channel",
                 EventHandlerType = EventHandlerTypes.TeamsChannel
             });

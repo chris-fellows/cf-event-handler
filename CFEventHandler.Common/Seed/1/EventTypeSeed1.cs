@@ -6,7 +6,7 @@ namespace CFEventHandler.Seed
     /// <summary>
     /// Event type seed example 1
     /// </summary>
-    internal class EventTypeSeed1 : IEntityList<EventType>
+    public class EventTypeSeed1 : IEntityList<EventType>
     {
         public async Task<List<EventType>> ReadAllAsync()
         {

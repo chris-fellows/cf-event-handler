@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace CFEventHandler.API.Exceptions
+namespace CFEventHandler.Exceptions
 {
     /// <summary>
     /// General exception

@@ -1,7 +1,7 @@
 ﻿using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 
-namespace CFEventHandler.Common.Interfaces
+namespace CFEventHandler.Interfaces
 {
     public interface IEventClientService
     {
@@ -10,27 +10,27 @@ namespace CFEventHandler.Common.Interfaces
         /// </summary>
         /// <param name="eventClientList"></param>
         /// <returns></returns>
-        Task Import(IEntityList<EventClient> eventClientList);
+        Task ImportAsync(IEntityList<EventClient> eventClientList);
 
         /// <summary>
         /// Exports to list
         /// </summary>
         /// <param name="eventTypeList"></param>
         /// <returns></returns>
-        Task Export(IEntityList<EventClient> eventClientList);
+        Task ExportAsync(IEntityList<EventClient> eventClientList);
 
         /// <summary>
         /// Gets all
         /// </summary>
         /// <returns></returns>
-        Task<List<EventClient>> GetAllAsync();
+        IEnumerable<EventClient> GetAll();
 
         /// <summary>
         /// Gets event client by Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EventClient> GetByIdAsync(string id);
+        Task<EventClient?> GetByIdAsync(string id);
 
         /// <summary>
         /// Adds event client

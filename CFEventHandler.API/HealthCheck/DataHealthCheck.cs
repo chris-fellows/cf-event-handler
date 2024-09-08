@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Text;
 
-namespace CFEventHandler.HealthCheck
+namespace CFEventHandler.API.HealthCheck
 {
     /// <summary>
     /// Data health check
@@ -21,7 +21,7 @@ namespace CFEventHandler.HealthCheck
         {
             StringBuilder data = new StringBuilder("");
 
-            var eventTypes = _eventTypeService.GetAllAsync().Result;
+            var eventTypes = _eventTypeService.GetAll();
             if (!eventTypes.Any())
             {
                 if (data.Length > 0) data.Append("; ");

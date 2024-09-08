@@ -1,9 +1,9 @@
 ﻿using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Net.Mail;
 
 namespace CFEventHandler.Email
 {
@@ -12,15 +12,14 @@ namespace CFEventHandler.Email
     /// </summary>
     public class EmailEventHandler : IEventHandler
     {        
-        private readonly IEnumerable<IEmailCreator> _emailFormatters;
+        //private readonly IEnumerable<IEmailCreator> _emailFormatters;
         private readonly IEmailSettingsService _emailSettingsService;
 
         public string Id => typeof(EmailEventHandler).Name;
 
-        public EmailEventHandler(IEnumerable<IEmailCreator> emailFormatters,
-                                IEmailSettingsService emailSettingsService)
+        public EmailEventHandler(IEmailSettingsService emailSettingsService)
         {
-            _emailFormatters = emailFormatters;
+            //_emailFormatters = emailFormatters;
             _emailSettingsService = emailSettingsService;
         }
 
@@ -29,28 +28,30 @@ namespace CFEventHandler.Email
             // Get event settings
             var eventSettings = _emailSettingsService.GetByIdAsync(eventSettingsId).Result;
 
-            if (eventSettings != null && !String.IsNullOrEmpty(eventSettings.Server))
-            {
-                // Create SMTP client
-                using (var smtpClient = GetSmtpClient(eventSettings))
-                {
-                    // Get email creator                    
-                    var emailCreator = _emailFormatters.FirstOrDefault(ef => ef.Id.Equals(eventSettings.EmailCreatorId, StringComparison.InvariantCultureIgnoreCase));
+            System.Diagnostics.Debug.WriteLine($"Sending email to {eventSettings.RecipientAddresses[0]} for event {eventInstance.Id}");
 
-                    // Create email
-                    var email = emailCreator.Create(eventInstance, eventSettings);
-                    smtpClient.Send(email);
-                }
-            }            
+            //if (eventSettings != null && !String.IsNullOrEmpty(eventSettings.Server))
+            //{
+            //    // Create SMTP client
+            //    using (var smtpClient = GetSmtpClient(eventSettings))
+            //    {
+            //        // Get email creator                    
+            //        var emailCreator = _emailFormatters.FirstOrDefault(ef => ef.Id.Equals(eventSettings.EmailCreatorId, StringComparison.InvariantCultureIgnoreCase));
+
+            //        // Create email
+            //        var email = emailCreator.Create(eventInstance, eventSettings);
+            //        smtpClient.Send(email);
+            //    }
+            //}            
         }
     
-        private SmtpClient GetSmtpClient(EmailEventSettings eventSettings)
-        {
-            var smtpClient = new SmtpClient(eventSettings.Server, eventSettings.Port);
-            smtpClient.UseDefaultCredentials = false;
-            smtpClient.Credentials = new System.Net.NetworkCredential(eventSettings.Username, eventSettings.Password);
-            smtpClient.EnableSsl = true;
-            return smtpClient;
-        }
+        //private SmtpClient GetSmtpClient(EmailEventSettings eventSettings)
+        //{
+        //    var smtpClient = new SmtpClient(eventSettings.Server, eventSettings.Port);
+        //    smtpClient.UseDefaultCredentials = false;
+        //    smtpClient.Credentials = new System.Net.NetworkCredential(eventSettings.Username, eventSettings.Password);
+        //    smtpClient.EnableSsl = true;
+        //    return smtpClient;
+        //}
     }
 }

@@ -16,8 +16,4 @@
     <ProjectReference Include="..\CFEventHandler.Common\CFEventHandler.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
-
 </Project>

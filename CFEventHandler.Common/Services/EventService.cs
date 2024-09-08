@@ -1,12 +1,7 @@
 ﻿using CFEventHandler.Common.Interfaces;
 using CFEventHandler.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CFEventHandler.Common.Services
+namespace CFEventHandler.Services
 {
     public class EventService : IEventService
     { 

@@ -14,6 +14,7 @@ Events can be handled by any of the following:
 - Send to HTTP endpoint. E.g. Pass event to REST API.
 - Create Jira issue.
 - SignalR client. E.g. CFEventHandler.Notifications.
+- SMS message.
 - Pass to SQL. E.g. Call stored procedure.
 - Post to MS Teams channel.
 

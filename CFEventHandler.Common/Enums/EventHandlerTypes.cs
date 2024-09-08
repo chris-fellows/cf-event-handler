@@ -9,6 +9,8 @@
         Email,
         HTTP,
         JiraIssue,
+        Process,
+        SMS,
         SQL,
         TeamsChannel
     }

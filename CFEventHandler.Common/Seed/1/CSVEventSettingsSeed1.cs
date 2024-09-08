@@ -1,8 +1,7 @@
-﻿using CFEventHandler.Console;
-using CFEventHandler.CSV;
+﻿using CFEventHandler.CSV;
 using CFEventHandler.Interfaces;
 
-namespace CFEventHandler.Common.Seed
+namespace CFEventHandler.Seed
 {
     public class CSVEventSettingsSeed1 : IEntityList<CSVEventSettings>
     {

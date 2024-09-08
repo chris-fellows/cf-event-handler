@@ -1,7 +1,7 @@
 ﻿using CFEventHandler.Interfaces;
 using CFEventHandler.SQL;
 
-namespace CFEventHandler.Common.Seed
+namespace CFEventHandler.Seed
 {
     public class SQLEventSettingsSeed1 : IEntityList<SQLEventSettings>
     {
@@ -12,6 +12,7 @@ namespace CFEventHandler.Common.Seed
             settings.Add(new SQLEventSettings()
             {
                 Id = "SQL1",
+                Name = "SQL (Default)",
                 ConnectionString = ""
             });
 

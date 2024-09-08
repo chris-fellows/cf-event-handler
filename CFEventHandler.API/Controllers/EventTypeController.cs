@@ -32,7 +32,7 @@ namespace CFEventHandler.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             // Get event types
-            var eventTypes = await _eventTypeService.GetAllAsync();
+            var eventTypes = _eventTypeService.GetAll();
 
             // Map models to DTO
             var eventTypeDTOs = _mapper.Map<List<EventTypeDTO>>(eventTypes);

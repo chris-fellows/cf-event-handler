@@ -17,7 +17,7 @@ namespace CFEventHandler.Email
 
         public string Password { get; set; } = String.Empty;
 
-        public string EmailCreatorId { get; set; } = String.Empty;
+        //public string EmailCreatorId { get; set; } = String.Empty;
 
         public string SenderAddress { get; set; } = String.Empty;
 

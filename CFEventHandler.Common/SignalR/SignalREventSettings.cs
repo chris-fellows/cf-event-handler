@@ -1,6 +1,6 @@
 ﻿using CFEventHandler.Models;
 
-namespace CFEventHandler.Common.SignalR
+namespace CFEventHandler.SignalR
 {
     public class SignalREventSettings : EventSettings
     {

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CFEventHandler.Hubs
+namespace CFEventHandler.API.Hubs
 {
     public class NotificationHub : Hub<INotificationClient>
     {

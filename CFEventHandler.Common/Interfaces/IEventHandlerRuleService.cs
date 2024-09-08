@@ -7,6 +7,13 @@ namespace CFEventHandler.Interfaces
     /// </summary>
     public interface IEventHandlerRuleService
     {
-        Task<List<EventHandlerRule>> GetAllAsync();
+        /// <summary>
+        /// Imports from list
+        /// </summary>
+        /// <param name="eventTypeList"></param>
+        /// <returns></returns>
+        Task ImportAsync(IEntityList<EventHandlerRule> eventHandlerRuleList);
+
+        IEnumerable<EventHandlerRule> GetAll();
     }
 }

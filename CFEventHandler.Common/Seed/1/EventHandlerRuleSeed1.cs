@@ -1,7 +1,7 @@
 ﻿using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 
-namespace CFEventHandler.Common.Seed
+namespace CFEventHandler.Seed
 {
     public class EventHandlerRuleSeed1 : IEntityList<EventHandlerRule>
     {

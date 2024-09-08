@@ -1,19 +1,20 @@
+using CFEventHandler.API.Extensions;
+using CFEventHandler.API.HealthCheck;
+using CFEventHandler.API.Hubs;
 using CFEventHandler.API.Interfaces;
 using CFEventHandler.API.Services;
 using CFEventHandler.Common.Interfaces;
 using CFEventHandler.Common.Process;
-using CFEventHandler.Common.Services;
-using CFEventHandler.Common.SignalR;
 using CFEventHandler.Console;
-using CFEventHandler.CSV;
 using CFEventHandler.Custom;
+using CFEventHandler.CSV;
 using CFEventHandler.Email;
-using CFEventHandler.HealthCheck;
 using CFEventHandler.HTTP;
-using CFEventHandler.Hubs;
 using CFEventHandler.Interfaces;
 using CFEventHandler.Process;
 using CFEventHandler.Services;
+using CFEventHandler.SignalR;
+using CFEventHandler.SMS;
 using CFEventHandler.SQL;
 using CFEventHandler.Teams;
 using FluentValidation;
@@ -41,23 +42,69 @@ builder.Services.AddHealthChecks()
 // Add fluent validation 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
-// Event settings service
-builder.Services.AddScoped<IConsoleSettingsService, ConsoleSettingsService>();
-builder.Services.AddScoped<ICSVSettingsService, CSVSettingsService>();
-//builder.Services.AddScoped<ICustomSettingsService, CustomSettingsService>();  // TODO: Consider removing
-builder.Services.AddScoped<IEmailSettingsService, EmailSettingsService>();
-builder.Services.AddScoped<IHTTPSettingsService, HTTPSettingsService>();
-builder.Services.AddScoped<IProcessSettingsService, ProcessSettingsService>();
-builder.Services.AddScoped<ISignalRSettingsService, SignalRSettingsService>();
-builder.Services.AddScoped<ISQLSettingsService, SQLSettingsService>();
-builder.Services.AddScoped<ITeamsSettingsService, TeamsSettingsService>();
+// TODO: Remove this
+var dataFolder = @"D:\\Data\\Temp\\EventHandlerData";
+
+// Event settings service (JSON for the moment)
+builder.Services.AddScoped<IConsoleSettingsService>((scope) =>
+{
+    return new JSONConsoleSettingsService(Path.Combine(dataFolder, "ConsoleSettings"));
+});
+builder.Services.AddScoped<ICSVSettingsService>((scope) =>
+{
+    return new JSONCSVSettingsService(Path.Combine(dataFolder, "CSVSettings"));
+});
+builder.Services.AddScoped<ICustomSettingsService>((scope) =>
+{
+    return new JSONCustomSettingsService(Path.Combine(dataFolder, "CustomSettings"));
+});
+builder.Services.AddScoped<IEmailSettingsService>((scope) =>
+{
+    return new JSONEmailSettingsService(Path.Combine(dataFolder, "EmailSettings"));
+});
+builder.Services.AddScoped<IHTTPSettingsService>((scope) =>
+{
+    return new JSONHTTPSettingsService(Path.Combine(dataFolder, "HTTPSettings"));
+});
+builder.Services.AddScoped<IProcessSettingsService>((scope) =>
+{
+    return new JSONProcessSettingsService(Path.Combine(dataFolder, "ProcessSettings"));
+});
+builder.Services.AddScoped<ISignalRSettingsService>((scope) =>
+{
+    return new JSONSignalRSettingsService(Path.Combine(dataFolder, "SignalRSettings"));
+});
+builder.Services.AddScoped<ISMSSettingsService>((scope) =>
+{
+    return new JSONSMSSettingsService(Path.Combine(dataFolder, "SMSSettings"));
+});
+builder.Services.AddScoped<ISQLSettingsService>((scope) =>
+{
+    return new JSONSQLSettingsService(Path.Combine(dataFolder, "SQLSettings"));
+});
+builder.Services.AddScoped<ITeamsSettingsService>((scope) =>
+{
+    return new JSONTeamsSettingsService(Path.Combine(dataFolder, "TeamsSettings"));
+});
 
 // General data services
-builder.Services.AddScoped<IEventClientService, EventClientService>();
-builder.Services.AddScoped<IEventHandlerRuleService, EventHandlerRuleService>();
-builder.Services.AddScoped<IEventHandlerService, EventHandlerService>();
+builder.Services.AddScoped<IEventClientService>((scope) =>
+{
+    return new JSONEventClientService(Path.Combine(dataFolder, "EventClients"));
+});
+builder.Services.AddScoped<IEventHandlerRuleService>((scope) =>
+{
+    return new JSONEventHandlerRuleService(Path.Combine(dataFolder, "EventHandlerRules"));
+});
+builder.Services.AddScoped<IEventHandlerService>((scope) =>
+{
+    return new JSONEventHandlerService(Path.Combine(dataFolder, "EventHandlers"));
+});
 builder.Services.AddScoped<IEventService, EventService>();
-builder.Services.AddScoped<IEventTypeService, EventTypeService>();
+builder.Services.AddScoped<IEventTypeService>((scope) =>
+{
+    return new JSONEventTypeService(Path.Combine(dataFolder, "EventTypes"));
+});
 
 // Set event manager that handles events
 builder.Services.AddScoped<IEventManagerService, EventManagerService>();
@@ -70,6 +117,9 @@ builder.Services.AddSingleton<IEventQueueService, MemoryEventQueueService>();
 
 // Set background service for processing events
 builder.Services.AddHostedService<EventBackgroundService>();
+
+// Register all event handlers
+builder.Services.RegisterAllTypes<IEventHandler>(new[] { typeof(IEventHandler).Assembly });
 
 var app = builder.Build();
 

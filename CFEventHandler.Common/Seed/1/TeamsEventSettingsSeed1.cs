@@ -1,7 +1,7 @@
 ﻿using CFEventHandler.Interfaces;
 using CFEventHandler.Teams;
 
-namespace CFEventHandler.Common.Seed
+namespace CFEventHandler.Seed
 {
     public class TeamsEventSettingsSeed1 : IEntityList<TeamsEventSettings>
     {
@@ -12,6 +12,7 @@ namespace CFEventHandler.Common.Seed
             settings.Add(new TeamsEventSettings()
             {
                 Id = "Teams1",
+                Name = "Teams (Default)",
                 URL = "https://www.google.co.uk"
             });
 

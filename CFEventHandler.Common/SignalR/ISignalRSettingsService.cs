@@ -1,6 +1,6 @@
 ﻿using CFEventHandler.Interfaces;
 
-namespace CFEventHandler.Common.SignalR
+namespace CFEventHandler.SignalR
 {
     public interface ISignalRSettingsService : IEventSettingsService<SignalREventSettings>
     {

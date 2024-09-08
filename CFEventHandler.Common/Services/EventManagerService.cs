@@ -1,5 +1,4 @@
-﻿using CFEventHandler.Enums;
-using CFEventHandler.Interfaces;
+﻿using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 
 namespace CFEventHandler.Services
@@ -57,7 +56,7 @@ namespace CFEventHandler.Services
 
             // Get event handler rules
             // TODO: Cache this
-            var eventHandlerRules = _eventHandlerRuleService.GetAllAsync().Result;
+            var eventHandlerRules = _eventHandlerRuleService.GetAll();
 
             // Check enabled rules
             foreach(var eventHandlerRule in eventHandlerRules.Where(ehr => ehr.Enabled && ehr.EventTypeId == eventInstance.EventTypeId))

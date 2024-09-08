@@ -1,4 +1,4 @@
-﻿namespace CFEventHandler.Hubs
+﻿namespace CFEventHandler.API.Hubs
 {
     public interface INotificationClient
     {

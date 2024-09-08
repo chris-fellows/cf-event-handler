@@ -1,4 +1,4 @@
-﻿using CFEventHandler.Hubs;
+﻿using CFEventHandler.API.Hubs;
 using CFEventHandler.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using System.Diagnostics;

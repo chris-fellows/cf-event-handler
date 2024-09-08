@@ -1,7 +1,7 @@
 ﻿using CFEventHandler.HTTP;
 using CFEventHandler.Interfaces;
 
-namespace CFEventHandler.Common.Seed
+namespace CFEventHandler.Seed
 {
     public class HTTPEventSettingsSeed1 : IEntityList<HTTPEventSettings>
     {
@@ -12,6 +12,7 @@ namespace CFEventHandler.Common.Seed
             settings.Add(new HTTPEventSettings()
             {
                 Id = "HTTP1",
+                Name = "HTTP (Default)",
                 Method = "POST",
                 Headers = new Dictionary<string, string>(),
                 URL = "http://myapi/dosomething"

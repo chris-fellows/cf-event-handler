@@ -1,13 +1,7 @@
 ﻿using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
-using CFEventHandler.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CFEventHandler.Common.SignalR
+namespace CFEventHandler.SignalR
 {
     /// <summary>
     /// Handles event by SignalR message

@@ -1,4 +1,4 @@
-﻿using CFEventHandler.API.Exceptions;
+﻿using CFEventHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -7,7 +7,7 @@ namespace CFEventHandler.API.Services
     /// <summary>
     /// Error middleware service
     /// </summary>
-    public class ErrorMiddlewareService
+    internal class ErrorMiddlewareService
     {        
         private readonly RequestDelegate _next;
 

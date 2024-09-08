@@ -1,6 +1,4 @@
-﻿using CFEventHandler.Models;
-using System;
-using EventHandler = CFEventHandler.Models.EventHandler;
+﻿using EventHandler = CFEventHandler.Models.EventHandler;
 
 namespace CFEventHandler.Interfaces
 {
@@ -14,27 +12,27 @@ namespace CFEventHandler.Interfaces
         /// </summary>
         /// <param name="eventHandlerList"></param>
         /// <returns></returns>
-        Task Import(IEntityList<EventHandler> eventHandlerList);
+        Task ImportAsync(IEntityList<EventHandler> eventHandlerList);
 
         /// <summary>
         /// Exports to list
         /// </summary>
         /// <param name="eventHandlerList"></param>
         /// <returns></returns>
-        Task Export(IEntityList<EventHandler> eventHandlerList);
+        Task ExportAsync(IEntityList<EventHandler> eventHandlerList);
 
         /// <summary>
         /// Gets all
         /// </summary>
         /// <returns></returns>
-        Task<List<EventHandler>> GetAllAsync();
+        IEnumerable<EventHandler> GetAll();
 
         /// <summary>
         /// Gets event handler by Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EventHandler> GetByIdAsync(string id);
+        Task<EventHandler?> GetByIdAsync(string id);
 
         /// <summary>
         /// Adds event handler

@@ -8,9 +8,13 @@ namespace CFEventHandler.Interfaces
     /// <typeparam name="TEntityType"></typeparam>
     public interface IEventSettingsService<TEntityType>
     {
-        Task<List<TEntityType>> GetAllAsync();
+        Task ImportAsync(IEntityList<TEntityType> eventTypeList);
+     
+        Task ExportAsync(IEntityList<TEntityType> eventTypeList);
+
+        IEnumerable<TEntityType> GetAll();
         
-        Task<TEntityType> GetByIdAsync(string id);
+        Task<TEntityType?> GetByIdAsync(string id);
 
         Task<TEntityType> AddAsync(TEntityType entityType);
 
