@@ -7,7 +7,7 @@ namespace CFEventHandler.SMS
     {
         private readonly ISMSSettingsService _smsSettingsService;
 
-        public string Id => typeof(SMSEventHandler).Name;
+        public string Id => "SMS";
 
         public SMSEventHandler(ISMSSettingsService smsSettingsService)
         {

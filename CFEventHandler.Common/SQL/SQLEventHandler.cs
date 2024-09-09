@@ -8,7 +8,7 @@ namespace CFEventHandler.SQL
     {
         private readonly ISQLSettingsService _sqlSettingsService;
 
-        public string Id => typeof(ConsoleEventHandler).Name;
+        public string Id => "SQL";
 
         public SQLEventHandler(ISQLSettingsService sqlSettingsService)
         {

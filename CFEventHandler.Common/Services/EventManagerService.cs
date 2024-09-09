@@ -1,5 +1,6 @@
 ﻿using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
+using System.Reflection.Metadata.Ecma335;
 
 namespace CFEventHandler.Services
 {
@@ -51,7 +52,7 @@ namespace CFEventHandler.Services
         /// <param name="eventInstance"></param>
         /// <returns></returns>
         private List<EventHandlingInfo> GetEventHandlers(EventInstance eventInstance)
-        {            
+        {
             var results = new List<EventHandlingInfo>();
 
             // Get event handler rules
@@ -59,18 +60,20 @@ namespace CFEventHandler.Services
             var eventHandlerRules = _eventHandlerRuleService.GetAll();
 
             // Check enabled rules
-            foreach(var eventHandlerRule in eventHandlerRules.Where(ehr => ehr.Enabled && ehr.EventTypeId == eventInstance.EventTypeId))
+            foreach (var eventHandlerRule in eventHandlerRules.Where(ehr => ehr.Enabled && 
+                            ehr.EventTypeId == eventInstance.EventTypeId &&
+                            ehr.IsEventMeetsRuleConditions(eventInstance)))
             {                
-                results.Add(new EventHandlingInfo()
-                {
-                    EventHandler = _eventHandlers.First(eh => eh.Id == eventHandlerRule.EventHandlerId),
-                    EventSettingsId = eventHandlerRule.EventSettingsId                    
-                });
+                    results.Add(new EventHandlingInfo()
+                    {
+                        EventHandler = _eventHandlers.First(eh => eh.Id == eventHandlerRule.EventHandlerId),
+                        EventSettingsId = eventHandlerRule.EventSettingsId
+                    });                
             }
 
             return results.OrderBy(r => r.EventHandler.Id).ToList();   // Consistent order
-        }
-       
+        }       
+
         /// <summary>
         /// Handles event asynchronously
         /// </summary>

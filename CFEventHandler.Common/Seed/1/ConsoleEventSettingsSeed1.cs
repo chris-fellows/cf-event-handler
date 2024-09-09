@@ -11,7 +11,7 @@ namespace CFEventHandler.Seed
 
             settings.Add(new ConsoleEventSettings()
             {
-                Id = "Console1",
+                Id = "Console1",                
                 Name = "Console (Default)"
             });
 

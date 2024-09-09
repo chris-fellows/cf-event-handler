@@ -13,7 +13,7 @@ namespace CFEventHandler.Custom
     {
         private readonly ICustomSettingsService _customSettingsService;
 
-        public string Id => typeof(CustomEventHandler).Name;
+        public string Id => "Custom";
 
         public CustomEventHandler(ICustomSettingsService customSettingsService)
         {

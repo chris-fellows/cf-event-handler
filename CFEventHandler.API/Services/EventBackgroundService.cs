@@ -51,7 +51,7 @@ namespace CFEventHandler.API.Services
                 }
                 else
                 {
-                    await Task.Delay(50000, stoppingToken);
+                    await Task.Delay(5000, stoppingToken);
                 }
 
                 //if (lastNotification.AddSeconds(10) <= DateTimeOffset.UtcNow)

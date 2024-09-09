@@ -10,7 +10,7 @@ namespace CFEventHandler.Console
     {
         private readonly IConsoleSettingsService _consoleSettingsService;
 
-        public string Id => typeof(ConsoleEventHandler).Name;
+        public string Id => "Console";
 
         public ConsoleEventHandler(IConsoleSettingsService consoleSettingsService)
         {

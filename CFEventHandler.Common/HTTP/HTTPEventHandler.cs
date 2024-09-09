@@ -10,7 +10,7 @@ namespace CFEventHandler.HTTP
     {
         private readonly IHTTPSettingsService _httpSettingsService;
 
-        public string Id => typeof(HTTPEventHandler).Name;
+        public string Id => "HTTP";
 
         public HTTPEventHandler(IHTTPSettingsService httpSettingsService)
         {

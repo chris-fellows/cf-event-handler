@@ -10,7 +10,7 @@ namespace CFEventHandler.SignalR
     {
         private readonly ISignalRSettingsService _signalRSettingsService;
 
-        public string Id => typeof(SignalEventHandler).Name;
+        public string Id => "SignalR";
 
         public SignalEventHandler(ISignalRSettingsService signalRSettingsService)
         {

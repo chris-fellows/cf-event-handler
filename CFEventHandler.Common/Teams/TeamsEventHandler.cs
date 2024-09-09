@@ -10,8 +10,8 @@ namespace CFEventHandler.Teams
     public class TeamsEventHandler : IEventHandler
     {
         private readonly ITeamsSettingsService _teamsSettingsService;
-            
-        public string Id => typeof(TeamsEventHandler).Name;
+
+        public string Id => "Teams";
 
         public TeamsEventHandler(ITeamsSettingsService teamsSettingsService)
         {

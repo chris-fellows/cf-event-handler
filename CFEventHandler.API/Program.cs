@@ -19,6 +19,7 @@ using CFEventHandler.SQL;
 using CFEventHandler.Teams;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using CFEventHandler.Common.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +86,12 @@ builder.Services.AddScoped<ISQLSettingsService>((scope) =>
 builder.Services.AddScoped<ITeamsSettingsService>((scope) =>
 {
     return new JSONTeamsSettingsService(Path.Combine(dataFolder, "TeamsSettings"));
+});
+
+// Email templates
+builder.Services.AddScoped<IEmailTemplateService>((scope) =>
+{
+    return new JSONEmailTemplateService(Path.Combine(dataFolder, "EmailTemplates"));
 });
 
 // General data services

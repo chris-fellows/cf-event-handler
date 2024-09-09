@@ -16,7 +16,7 @@ namespace CFEventHandler.CSV
     {
         private readonly ICSVSettingsService _csvSettingsService;
 
-        public string Id => typeof(CSVEventHandler).Name;
+        public string Id => "CSV";
 
         public CSVEventHandler(ICSVSettingsService csvSettingsService)
         {

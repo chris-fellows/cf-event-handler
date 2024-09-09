@@ -12,7 +12,13 @@ namespace CFEventHandler.Seed
             settings.Add(new EmailEventSettings()
             {
                 Id = "Email1",
-                Name = "Email (Default)"
+                Name = "Email (Default)",
+                Password = "",
+                Port = 587,
+                RecipientAddresses = new List<string>() { "chrismfellows@hotmail.co.uk" },
+                SenderAddress = "chrismfellows@hotmail.co.uk",
+                Server = "smtp.live.com",
+                Username = "chrismfellows@hotmail.co.uk"                
             });
 
             settings.Add(new EmailEventSettings()

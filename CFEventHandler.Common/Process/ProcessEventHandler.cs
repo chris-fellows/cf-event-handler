@@ -11,7 +11,7 @@ namespace CFEventHandler.Process
     {
         private readonly IProcessSettingsService _processSettingsService;
 
-        public string Id => typeof(ProcessEventHandler).Name;
+        public string Id => "Process";
 
         public ProcessEventHandler(IProcessSettingsService processSettingsService)
         {

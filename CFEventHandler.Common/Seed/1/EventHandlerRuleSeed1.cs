@@ -1,4 +1,5 @@
-﻿using CFEventHandler.Interfaces;
+﻿using CFEventHandler.Enums;
+using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 
 namespace CFEventHandler.Seed
@@ -13,18 +14,36 @@ namespace CFEventHandler.Seed
             {
                 Id = "1",
                 EventTypeId = "1",                
-                EventHandlerId = "5",
+                EventHandlerId = "Email",
                 EventSettingsId = "Email1",
-                Name = "Event handler rule 1"
+                Name = "Event handler rule 1",
+                Conditions = new List<Condition>()
+                {
+                    new Condition()
+                    {
+                        ItemName = "CompanyId",
+                        ConditionType = ConditionTypes.Equals,
+                        Values = new List<object>() { 1 }                        
+                    }
+                }
             });
 
             eventHandlerRules.Add(new EventHandlerRule()
             {
                 Id = "2",
                 EventTypeId = "2",
-                EventHandlerId = "5",
+                EventHandlerId = "Email",
                 EventSettingsId = "Email2",
-                Name = "Event handler rule 2"
+                Name = "Event handler rule 2",
+                Conditions = new List<Condition>()
+                {
+                    new Condition()
+                    {
+                        ItemName = "CompanyId",
+                        ConditionType = ConditionTypes.Equals,
+                        Values = new List<object>() { 2 }
+                    }
+                }
             });
 
             return eventHandlerRules;
