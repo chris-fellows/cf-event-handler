@@ -74,6 +74,10 @@ The following notifications can be received:
 - Diagnostics from event processing.
 - Events where there is an event rule for the SignalR client.
 
+Log Event (Script)
+------------------
+The script (Scripts\Log Event\*.cmd) will log an event stored in a .json file.
+
 Health Checks
 -------------
 The API health check is available from the /health endpoint
