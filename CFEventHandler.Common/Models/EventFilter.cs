@@ -12,5 +12,10 @@
         public DateTimeOffset FromCreatedDateTime { get; set; }
 
         public DateTimeOffset ToCreatedDateTime { get; set; }
+
+        public bool IsValidForFilter(EventInstance eventInstance)
+        {
+            return true;
+        }
     }
 }

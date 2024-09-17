@@ -14,31 +14,31 @@ namespace CFEventHandler.Seed
 
             eventTypes.Add(new EventType()
             {
-                Id = "1",
+                //Id = "1",
                 Name = "Test event 1"
             });
 
             eventTypes.Add(new EventType()
             {
-                Id = "2",
+                //Id = "2",
                 Name = "Test event 2"
             });
 
             eventTypes.Add(new EventType()
             {
-                Id = "3",
+                //Id = "3",
                 Name = "Test event 3"
             });
 
             eventTypes.Add(new EventType()
             {
-                Id = "4",
+                //Id = "4",
                 Name = "Test event 4"
             });
 
             eventTypes.Add(new EventType()
             {
-                Id = "5",
+                //Id = "5",
                 Name = "Test event 5"
             });
 
@@ -47,7 +47,7 @@ namespace CFEventHandler.Seed
 
         public async Task WriteAllAsync(List<EventType> eventTypes)
         {
-            // No action
+            // No action            
         }
     }
 }

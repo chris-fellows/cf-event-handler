@@ -1,11 +1,14 @@
 ﻿namespace CFEventHandler.Models.DTO
 {
+    /// <summary>
+    /// Event instance DTO
+    /// </summary>
     public class EventInstanceDTO
-    { 
-        // <summary>
+    {
+        /// <summary>
         /// Unique Id
         /// </summary>
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Id { get; set; } = String.Empty;
 
         /// <summary>
         /// Event type

@@ -11,7 +11,7 @@ namespace CFEventHandler.Seed
 
             settings.Add(new EmailEventSettings()
             {
-                Id = "Email1",
+                //Id = "Email1",
                 Name = "Email (Default)",
                 Password = "",
                 Port = 587,
@@ -23,7 +23,7 @@ namespace CFEventHandler.Seed
 
             settings.Add(new EmailEventSettings()
             {
-                Id = "Email2",
+                //Id = "Email2",
                 Name = "Email (2)"
             });
 

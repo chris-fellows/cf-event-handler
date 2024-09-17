@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CFEventHandler.Models.DTO
+﻿namespace CFEventHandler.Models.DTO
 {
+    /// <summary>
+    /// Event type DTO
+    /// </summary>
     public class EventTypeDTO
     {
         public string Id { get; set; } = String.Empty;

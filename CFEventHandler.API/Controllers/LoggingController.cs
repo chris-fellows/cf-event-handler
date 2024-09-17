@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using CFEventHandler.Models;
 using CFEventHandler.Models.DTO;
 using CFEventHandler.Interfaces;
-using CFEventHandler.Common.Interfaces;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace CFEventHandler.API.Controllers
@@ -12,7 +11,7 @@ namespace CFEventHandler.API.Controllers
     /// <summary>
     /// Logging controller
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     //[SwaggerTag("Controller for logging events")]
     public class LoggingController : ControllerBase

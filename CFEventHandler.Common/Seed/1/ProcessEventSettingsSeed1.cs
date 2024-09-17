@@ -11,7 +11,7 @@ namespace CFEventHandler.Seed
 
             settings.Add(new ProcessEventSettings()
             {
-                Id = "Process1",
+                //Id = "Process1",
                 Name = "Process (Default)",
                 PathToProcess = "D:\\Temp\\SomeProcess.exe"
             });

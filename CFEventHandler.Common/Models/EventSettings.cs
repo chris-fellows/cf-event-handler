@@ -1,4 +1,7 @@
-﻿namespace CFEventHandler.Models
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+
+namespace CFEventHandler.Models
 {
     /// <summary>
     /// Settings for handling event
@@ -8,6 +11,8 @@
         /// <summary>
         /// Unique Id
         /// </summary>
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = String.Empty;
 
         /// <summary>

@@ -3,14 +3,13 @@ using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 using CFEventHandler.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing.Matching;
 
 namespace CFEventHandler.API.Controllers
 {
     /// <summary>
     /// Event type controller
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     //[SwaggerTag("Controller for event type data")]
     public class EventTypeController : ControllerBase
@@ -43,6 +42,7 @@ namespace CFEventHandler.API.Controllers
         /// <summary>
         /// Gets all event types
         /// </summary>
+        /// <param name="id">Event Type Id</param>
         /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
@@ -61,7 +61,7 @@ namespace CFEventHandler.API.Controllers
         }
 
         /// <summary>
-        /// Creates event type
+        /// Create event type
         /// </summary>
         /// <param name="eventTypeDTO"></param>
         /// <returns></returns>
@@ -77,22 +77,27 @@ namespace CFEventHandler.API.Controllers
             // Map model to DTO
             var newEventTypeDTO = _mapper.Map<EventTypeDTO>(eventType);
 
-            return Ok(newEventTypeDTO);
+            return CreatedAtAction(nameof(GetById), new { id = newEventTypeDTO.Id }, newEventTypeDTO);            
         }
 
         /// <summary>
-        /// Updates event type
+        /// Update event type
         /// </summary>
         /// <param name="eventTypeDTO"></param>
+        /// <param name="id">Event Type Id</param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Updated(EventTypeDTO eventTypeDTO, string id)
+        public async Task<IActionResult> Update(EventTypeDTO eventTypeDTO, string id)
         {            
             // Map 
             var eventType = _mapper.Map<EventType>(eventTypeDTO);
 
             // Get from DB
-            var eventTypeDB = await _eventTypeService.GetByIdAsync(eventType.Id);
+            var eventTypeDB = await _eventTypeService.GetByIdAsync(id);
+            if (eventTypeDB == null)
+            {
+                return NotFound();
+            }
 
             // Save
             await _eventTypeService.AddAsync(eventType);

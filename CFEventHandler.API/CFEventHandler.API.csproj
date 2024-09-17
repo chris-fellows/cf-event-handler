@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\cf-utilities-core\CFUtilities\CFUtilities.csproj" />
     <ProjectReference Include="..\CFEventHandler.Common\CFEventHandler.Common.csproj" />
   </ItemGroup>
 

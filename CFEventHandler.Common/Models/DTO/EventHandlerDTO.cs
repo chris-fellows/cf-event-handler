@@ -2,6 +2,9 @@
 
 namespace CFEventHandler.Models.DTO
 {
+    /// <summary>
+    /// Event handler DTO
+    /// </summary>
     public class EventHandlerDTO
     {
         public string Id { get; set; } = String.Empty;

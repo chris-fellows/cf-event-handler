@@ -8,6 +8,10 @@ E.g. Event with event type 1234 (Error) and event parameter CompanyId=1 sends an
 E.g. Event with event type 1234 (Error) and event parameter CompanyId=2 sends an email to Y and posts to a MS Teams channel.
 E.g. Event with event type 4567 (Warning) logs to console.
 
+Database
+--------
+Data is stored in a MongoDB database. There's a free cloud tier.
+
 Event
 -----
 The event contains the following information:

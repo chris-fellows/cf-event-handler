@@ -9,7 +9,7 @@ namespace CFEventHandler.API.Controllers
     /// <summary>
     /// Event handler controller
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     //[SwaggerTag("Controller for event handler data")]
     public class EventHandlerController : ControllerBase

@@ -11,13 +11,13 @@ namespace CFEventHandler.Seed
 
             eventClients.Add(new EventClient()
             {
-                Id = "1",
+                //Id = "1",
                 Name = "Client 1"
             });
 
             eventClients.Add(new EventClient()
             {
-                Id = "2",
+                //Id = "2",
                 Name = "Client 2"
             });
 

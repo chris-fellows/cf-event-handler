@@ -1,9 +1,9 @@
-﻿using CFEventHandler.Interfaces;
+﻿//using CFEventHandler.Interfaces;
 
-namespace CFEventHandler.Custom
-{
-    public interface ICustomSettingsService : IEventSettingsService<CustomEventSettings>
-    {
+//namespace CFEventHandler.Custom
+//{
+//    public interface ICustomSettingsService : IEventSettingsService<CustomEventSettings>
+//    {
         
-    }
-}
+//    }
+//}

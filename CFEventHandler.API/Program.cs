@@ -3,10 +3,7 @@ using CFEventHandler.API.HealthCheck;
 using CFEventHandler.API.Hubs;
 using CFEventHandler.API.Interfaces;
 using CFEventHandler.API.Services;
-using CFEventHandler.Common.Interfaces;
-using CFEventHandler.Common.Process;
 using CFEventHandler.Console;
-using CFEventHandler.Custom;
 using CFEventHandler.CSV;
 using CFEventHandler.Email;
 using CFEventHandler.HTTP;
@@ -20,6 +17,9 @@ using CFEventHandler.Teams;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using CFEventHandler.Common.Email;
+using CFEventHandler.API.Models;
+using Microsoft.Extensions.Options;
+using CFEventHandler.Common.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,50 +43,30 @@ builder.Services.AddHealthChecks()
 // Add fluent validation 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
+// Configure database config from appSettings.json
+builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection(nameof(DatabaseConfig)));
+builder.Services.AddSingleton<IDatabaseConfig>(sp => sp.GetRequiredService<IOptions<DatabaseConfig>>().Value);
+
 // TODO: Remove this
 var dataFolder = @"D:\\Data\\Temp\\EventHandlerData";
 
+// Database admin
+builder.Services.AddScoped<IDatabaseAdmin, MongoDBAdmin>();
+
 // Event settings service (JSON for the moment)
-builder.Services.AddScoped<IConsoleSettingsService>((scope) =>
-{
-    return new JSONConsoleSettingsService(Path.Combine(dataFolder, "ConsoleSettings"));
-});
-builder.Services.AddScoped<ICSVSettingsService>((scope) =>
-{
-    return new JSONCSVSettingsService(Path.Combine(dataFolder, "CSVSettings"));
-});
-builder.Services.AddScoped<ICustomSettingsService>((scope) =>
-{
-    return new JSONCustomSettingsService(Path.Combine(dataFolder, "CustomSettings"));
-});
-builder.Services.AddScoped<IEmailSettingsService>((scope) =>
-{
-    return new JSONEmailSettingsService(Path.Combine(dataFolder, "EmailSettings"));
-});
-builder.Services.AddScoped<IHTTPSettingsService>((scope) =>
-{
-    return new JSONHTTPSettingsService(Path.Combine(dataFolder, "HTTPSettings"));
-});
-builder.Services.AddScoped<IProcessSettingsService>((scope) =>
-{
-    return new JSONProcessSettingsService(Path.Combine(dataFolder, "ProcessSettings"));
-});
-builder.Services.AddScoped<ISignalRSettingsService>((scope) =>
-{
-    return new JSONSignalRSettingsService(Path.Combine(dataFolder, "SignalRSettings"));
-});
-builder.Services.AddScoped<ISMSSettingsService>((scope) =>
-{
-    return new JSONSMSSettingsService(Path.Combine(dataFolder, "SMSSettings"));
-});
-builder.Services.AddScoped<ISQLSettingsService>((scope) =>
-{
-    return new JSONSQLSettingsService(Path.Combine(dataFolder, "SQLSettings"));
-});
-builder.Services.AddScoped<ITeamsSettingsService>((scope) =>
-{
-    return new JSONTeamsSettingsService(Path.Combine(dataFolder, "TeamsSettings"));
-});
+builder.Services.AddScoped<IConsoleSettingsService, MongoDBConsoleSettingsService>();
+builder.Services.AddScoped<ICSVSettingsService, MongoDBCSVSettingsService>();
+//builder.Services.AddScoped<ICustomSettingsService>((scope) =>
+//{
+//    return new JSONCustomSettingsService(Path.Combine(dataFolder, "CustomSettings"));
+//});
+builder.Services.AddScoped<IEmailSettingsService, MongoDBEmailSettingsService>();
+builder.Services.AddScoped<IHTTPSettingsService, MongoDBHTTPSettingsService>();
+builder.Services.AddScoped<IProcessSettingsService, MongoDBProcessSettingsService>();
+builder.Services.AddScoped<ISignalRSettingsService, MongoDBSignalRSettingsService>();
+builder.Services.AddScoped<ISMSSettingsService, MongoDBSMSSettingsService>();
+builder.Services.AddScoped<ISQLSettingsService, MongoDBSQLSettingsService>();
+builder.Services.AddScoped<ITeamsSettingsService, MongoDBTeamsSettingsService>();
 
 // Email templates
 builder.Services.AddScoped<IEmailTemplateService>((scope) =>
@@ -95,23 +75,11 @@ builder.Services.AddScoped<IEmailTemplateService>((scope) =>
 });
 
 // General data services
-builder.Services.AddScoped<IEventClientService>((scope) =>
-{
-    return new JSONEventClientService(Path.Combine(dataFolder, "EventClients"));
-});
-builder.Services.AddScoped<IEventHandlerRuleService>((scope) =>
-{
-    return new JSONEventHandlerRuleService(Path.Combine(dataFolder, "EventHandlerRules"));
-});
-builder.Services.AddScoped<IEventHandlerService>((scope) =>
-{
-    return new JSONEventHandlerService(Path.Combine(dataFolder, "EventHandlers"));
-});
-builder.Services.AddScoped<IEventService, EventService>();
-builder.Services.AddScoped<IEventTypeService>((scope) =>
-{
-    return new JSONEventTypeService(Path.Combine(dataFolder, "EventTypes"));
-});
+builder.Services.AddScoped<IEventClientService, MongoDBEventClientService>();
+builder.Services.AddScoped<IEventHandlerRuleService, MongoDBEventHandlerRuleService>();
+builder.Services.AddScoped<IEventHandlerService, MongoDBEventHandlerService>();
+builder.Services.AddScoped<IEventService, MongoDBEventService>();
+builder.Services.AddScoped<IEventTypeService, MongoDBEventTypeService>();
 
 // Set event manager that handles events
 builder.Services.AddScoped<IEventManagerService, EventManagerService>();
@@ -149,5 +117,12 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Initialise database
+using (var scope = app.Services.CreateScope())
+{    
+    var databaseAdmin = scope.ServiceProvider.GetRequiredService<IDatabaseAdmin>();
+    await databaseAdmin.InitialiseAsync();    
+}
 
 app.Run();

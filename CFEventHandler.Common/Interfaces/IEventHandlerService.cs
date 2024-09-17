@@ -1,4 +1,5 @@
-﻿using EventHandler = CFEventHandler.Models.EventHandler;
+﻿using CFEventHandler.Models;
+using EventHandler = CFEventHandler.Models.EventHandler;
 
 namespace CFEventHandler.Interfaces
 {
@@ -34,6 +35,13 @@ namespace CFEventHandler.Interfaces
         /// <returns></returns>
         Task<EventHandler?> GetByIdAsync(string id);
 
+        /// <summary>
+        /// Gets event handler byname
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        Task<EventHandler?> GetByNameAsync(string name);
+        
         /// <summary>
         /// Adds event handler
         /// </summary>

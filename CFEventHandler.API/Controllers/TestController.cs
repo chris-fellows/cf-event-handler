@@ -9,7 +9,7 @@ namespace CFEventHandler.API.Controllers
     /// <summary>
     /// Test controller
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class TestController : ControllerBase
     {

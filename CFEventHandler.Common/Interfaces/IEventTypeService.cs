@@ -32,6 +32,13 @@ namespace CFEventHandler.Interfaces
         Task<EventType?> GetByIdAsync(string id);
 
         /// <summary>
+        /// Gets event type by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        Task<EventType?> GetByNameAsync(string name);
+
+        /// <summary>
         /// Adds event type
         /// </summary>
         /// <param name="eventType"></param>

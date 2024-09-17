@@ -11,7 +11,7 @@ namespace CFEventHandler.Seed
 
             settings.Add(new SMSEventSettings()
             {
-                Id = "SMS1",
+                //Id = "SMS1",
                 Name = "SMS (Default)"
             });
 

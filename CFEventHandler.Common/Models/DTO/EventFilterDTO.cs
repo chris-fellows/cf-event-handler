@@ -1,7 +1,7 @@
 ﻿namespace CFEventHandler.Models.DTO
 {
     /// <summary>
-    /// Event filter
+    /// Event filter DTO
     /// </summary>
     public class EventFilterDTO
     {
