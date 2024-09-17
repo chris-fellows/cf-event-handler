@@ -8,13 +8,19 @@ namespace CFEventHandler.Email
     /// Handles event by sending email
     /// </summary>
     public class EmailEventHandler : IEventHandler
-    {                
+    {
+        private readonly IDocumentTemplateProcessor _documentTemplateProcessor;
+        private readonly IDocumentTemplateService _documentTemplateService;
         private readonly IEmailSettingsService _emailSettingsService;
 
         public string Id => "Email";
 
-        public EmailEventHandler(IEmailSettingsService emailSettingsService)
-        {            
+        public EmailEventHandler(IDocumentTemplateProcessor documentTemplateProcessor,
+                                IDocumentTemplateService documentTemplateService,       
+                                IEmailSettingsService emailSettingsService)
+        {
+            _documentTemplateProcessor = documentTemplateProcessor;
+            _documentTemplateService = documentTemplateService;
             _emailSettingsService = emailSettingsService;
         }
 
@@ -39,8 +45,11 @@ namespace CFEventHandler.Email
             }
         }
 
-        private static MailMessage GetMailMessage(EventInstance eventInstance, EmailEventSettings emailEventSettings)
+        private MailMessage GetMailMessage(EventInstance eventInstance, EmailEventSettings emailEventSettings)
         {
+            // Get document template for email content
+            var documentTemplate = _documentTemplateService.GetByIdAsync(emailEventSettings.ContentDocumentTemplateId).Result;
+
             var mail = new MailMessage();
             mail.From = new MailAddress(emailEventSettings.SenderAddress);
             foreach(var address in emailEventSettings.RecipientAddresses)
@@ -49,15 +58,15 @@ namespace CFEventHandler.Email
             }
             mail.IsBodyHtml = true;
             mail.Subject = eventInstance.EventTypeId;
-            mail.Body = eventInstance.EventTypeId;  // TODO: Set this
+            mail.Body = _documentTemplateProcessor.Process(documentTemplate, eventInstance).Result;            
             return mail;            
         }
 
         private static SmtpClient GetSmtpClient(EmailEventSettings eventSettings)
         {
-            var smtpClient = new SmtpClient(eventSettings.Server, eventSettings.Port);
+            var smtpClient = new SmtpClient(eventSettings.EmailConnection.Server, eventSettings.EmailConnection.Port);
             smtpClient.UseDefaultCredentials = false;
-            smtpClient.Credentials = new System.Net.NetworkCredential(eventSettings.Username, eventSettings.Password);
+            smtpClient.Credentials = new System.Net.NetworkCredential(eventSettings.EmailConnection.Username, eventSettings.EmailConnection.Password);
             smtpClient.EnableSsl = true;
             return smtpClient;
         }

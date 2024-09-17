@@ -8,12 +8,18 @@ namespace CFEventHandler.HTTP
     /// </summary>
     public class HTTPEventHandler : IEventHandler
     {
+        private readonly IDocumentTemplateProcessor _documentTemplateProcessor;
+        private readonly IDocumentTemplateService _documentTemplateService;
         private readonly IHTTPSettingsService _httpSettingsService;
 
         public string Id => "HTTP";
 
-        public HTTPEventHandler(IHTTPSettingsService httpSettingsService)
+        public HTTPEventHandler(IDocumentTemplateProcessor documentTemplateProcessor,
+                            IDocumentTemplateService documentTemplateService,
+                            IHTTPSettingsService httpSettingsService)
         {
+            _documentTemplateProcessor = documentTemplateProcessor;
+            _documentTemplateService = documentTemplateService;
             _httpSettingsService = httpSettingsService;
         }
 

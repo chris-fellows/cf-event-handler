@@ -50,6 +50,9 @@ builder.Services.AddSingleton<IDatabaseConfig>(sp => sp.GetRequiredService<IOpti
 // TODO: Remove this
 var dataFolder = @"D:\\Data\\Temp\\EventHandlerData";
 
+// Document template processor
+builder.Services.AddScoped<IDocumentTemplateProcessor, DocumentTemplateProcessor>();
+
 // Database admin
 builder.Services.AddScoped<IDatabaseAdmin, MongoDBAdmin>();
 
@@ -68,13 +71,8 @@ builder.Services.AddScoped<ISMSSettingsService, MongoDBSMSSettingsService>();
 builder.Services.AddScoped<ISQLSettingsService, MongoDBSQLSettingsService>();
 builder.Services.AddScoped<ITeamsSettingsService, MongoDBTeamsSettingsService>();
 
-// Email templates
-builder.Services.AddScoped<IEmailTemplateService>((scope) =>
-{
-    return new JSONEmailTemplateService(Path.Combine(dataFolder, "EmailTemplates"));
-});
-
 // General data services
+builder.Services.AddScoped<IDocumentTemplateService, MongoDBDocumentTemplateService>();
 builder.Services.AddScoped<IEventClientService, MongoDBEventClientService>();
 builder.Services.AddScoped<IEventHandlerRuleService, MongoDBEventHandlerRuleService>();
 builder.Services.AddScoped<IEventHandlerService, MongoDBEventHandlerService>();

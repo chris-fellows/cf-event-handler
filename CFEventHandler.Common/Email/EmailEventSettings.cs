@@ -1,6 +1,4 @@
 ﻿using CFEventHandler.Models;
-using System;
-using System.Collections.Generic;
 
 namespace CFEventHandler.Email
 {
@@ -9,18 +7,18 @@ namespace CFEventHandler.Email
     /// </summary>
     public class EmailEventSettings : EventSettings
     {
-        public string Server { get; set; } = String.Empty;
-
-        public int Port { get; set; } = 0;
-
-        public string Username { get; set; } = String.Empty;
-
-        public string Password { get; set; } = String.Empty;
-
-        //public string EmailCreatorId { get; set; } = String.Empty;
-
+        /// <summary>
+        /// Email connection details
+        /// </summary>
+        public EmailConnection EmailConnection { get; set; }
+       
         public string SenderAddress { get; set; } = String.Empty;
 
         public List<string> RecipientAddresses { get; set; }
+
+        /// <summary>
+        /// Document template for email content (DocumentTemplate.Id)
+        /// </summary>
+        public string ContentDocumentTemplateId { get; set; } = String.Empty;
     }
 }

@@ -47,7 +47,15 @@ Event Settings
 --------------
 Event settings contain settings for handling the event. The settings depend on the particular event handler
 that is handling the event. E.g. For an email then the settings contain email server credentials, email recipient(s) 
-and instructions for formatting the email body.
+and the document template for the email body.
+
+Document Template
+-----------------
+A document template contains a template to use for content when handling an event. E.g. An email body template,
+an HTTP content template, an MS Teams content template.
+
+When the event is handled then the template placeholders will be replaced with the relevant values. Values will
+typically be copied from the event paramaters.
 
 Event Handler Rule
 ------------------
@@ -68,6 +76,7 @@ Instructions for configuring the system:
 - Configure list of event clients via REST API.
 - Configure list of event types via REST API.
 - Configure list of event handler rules via REST API.
+- Configure list of document templates via REST API. E.g. Email body template.
 - Configure list of event settings to use when handling events via REST API.
 
 CFEventHandler.Notifications (Console App)
