@@ -26,12 +26,14 @@ namespace CFEventHandler.Email
 
         public void Handle(EventInstance eventInstance, string eventSettingsId)
         {
+            return; // Do nothing
+
             // Get event settings
             var eventSettings = _emailSettingsService.GetByIdAsync(eventSettingsId).Result;
 
             System.Diagnostics.Debug.WriteLine($"Sending email to {eventSettings.RecipientAddresses[0]} for event {eventInstance.Id}");
 
-            if (eventSettings != null && !String.IsNullOrEmpty(eventSettings.Server))
+            if (eventSettings != null && !String.IsNullOrEmpty(eventSettings.EmailConnection.Server))
             {
                 // Create SMTP client
                 using (var smtpClient = GetSmtpClient(eventSettings))

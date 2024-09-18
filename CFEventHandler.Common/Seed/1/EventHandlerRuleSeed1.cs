@@ -58,6 +58,7 @@ namespace CFEventHandler.Seed
 
             // Get event handlers
             var eventHandlers = _eventHandlerService.GetAll();
+            var eventHandlerConsole = eventHandlers.First(eh => eh.Name == "Console");
             var eventHandlerEmail = eventHandlers.First(eh => eh.Name == "Email");
 
             // Get event types
@@ -69,13 +70,14 @@ namespace CFEventHandler.Seed
             var emailSettings1 = emailSettingsList.First(es => es.Name == "Email (Default)");
             var emailSettings2 = emailSettingsList.First(es => es.Name == "Email (2)");
 
+            // Add email #1 handler
             eventHandlerRules.Add(new EventHandlerRule()
             {
                 //Id = "1",
                 EventTypeId = eventTypeTest1.Id,
                 EventHandlerId = eventHandlerEmail.Id,
                 EventSettingsId = emailSettings1.Id,
-                Name = "Event handler rule 1",
+                Name = $"Event handler ({eventHandlerEmail.Name}:{eventTypeTest1.Name})",
                 Conditions = new List<Condition>()
                 {
                     new Condition()
@@ -87,13 +89,14 @@ namespace CFEventHandler.Seed
                 }
             });
 
+            // Add email #2 handler
             eventHandlerRules.Add(new EventHandlerRule()
             {
                 //Id = "2",
                 EventTypeId = eventTypeTest2.Id,
                 EventHandlerId = eventHandlerEmail.Id,
                 EventSettingsId = emailSettings2.Id,
-                Name = "Event handler rule 2",
+                Name = $"Event handler ({eventHandlerEmail.Name}:{eventTypeTest2.Name})",
                 Conditions = new List<Condition>()
                 {
                     new Condition()
@@ -104,6 +107,27 @@ namespace CFEventHandler.Seed
                     }
                 }
             });
+
+            // Add console event handler for every event
+            foreach(var eventType in eventTypes)
+            {
+                eventHandlerRules.Add(new EventHandlerRule()
+                {
+                    //Id = "2",
+                    EventTypeId = eventType.Id,
+                    EventHandlerId = eventHandlerConsole.Id,                    
+                    Name = $"Event handler ({eventHandlerConsole.Name}:{eventType.Name})",
+                    Conditions = new List<Condition>()
+                    {
+                        new Condition()
+                        {
+                            ItemName = "CompanyId",
+                            ConditionType = ConditionTypes.Equals,
+                            Values = new List<object>() { 1 }
+                        }
+                    }
+                });
+            }
 
             return eventHandlerRules;
         }

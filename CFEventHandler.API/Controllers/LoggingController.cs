@@ -50,11 +50,11 @@ namespace CFEventHandler.API.Controllers
         }
 
         /// <summary>
-        /// Returns list of events logged
+        /// Returns filtered list of events logged
         /// </summary>        
         /// <returns></returns>
-        [HttpGet]
-        public async Task<IActionResult> GetFiltered([FromBody] EventFilterDTO eventFilterDTO)
+        [HttpGet]        
+        public async Task<IActionResult> GetFiltered([FromQuery] EventFilterDTO eventFilterDTO)
         {
             var eventFilter = _mapper.Map<EventFilter>(eventFilterDTO);
 

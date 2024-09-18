@@ -12,80 +12,70 @@ namespace CFEventHandler.API.Controllers
     [Route("[controller]")]
     [ApiController]
     public class TestController : ControllerBase
-    {
+    {        
+        private readonly IEventClientService _eventClientService;
         private readonly IEventQueueService _eventQueueService;
+        private readonly IEventService _eventService;
+        private readonly IEventTypeService _eventTypeService;
 
-        public TestController(IEventQueueService eventQueueService)
+        public TestController(IEventClientService eventClientService,
+                            IEventQueueService eventQueueService,
+                            IEventService eventService,
+                            IEventTypeService eventTypeService)
         {
+            _eventClientService = eventClientService;
             _eventQueueService = eventQueueService;
-        }
+            _eventService = eventService;
+            _eventTypeService = eventTypeService;
+        }     
 
         /// <summary>
-        /// Adds test log entries
+        /// Adds test log entries (1 or more)
         /// </summary>
         /// <param name="eventInstanceDTO"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("AddLogs")]
-        public async Task<IActionResult> Log()
-        {
-            var eventInstance1 = new EventInstance()
+        public async Task<IActionResult> Logs([FromQuery] int eventCount = 1)
+        {          
+            // Get event client, event type
+            var eventClient = await _eventClientService.GetByNameAsync("Client 1");
+            var eventType = await _eventTypeService.GetByNameAsync("Test event 1");
+
+            for (int index = 0; index < eventCount; index++)
             {
-                Id = Guid.NewGuid().ToString(),
-                CreatedDateTime = DateTime.Now,
-                EventTypeId = "1",
-                EventClientId = "1",                
-                Parameters  = new List<EventParameter>()
+                var eventInstance1 = new EventInstance()
                 {
-                    new EventParameter()
+                    //Id = Guid.NewGuid().ToString(),
+                    CreatedDateTime = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(index)),
+                    EventTypeId = eventType.Id,
+                    EventClientId = eventClient.Id,
+                    Parameters = new List<EventParameter>()
                     {
-                        Name = "CompanyId",
-                        Value = 1
-                    },
-                    new EventParameter()
-                    {
-                        Name = "Value3",
-                        Value = true
-                    },
-                    new EventParameter()
-                    {
-                        Name = "Value2",
-                        Value = "Test value"
+                        new EventParameter()
+                        {
+                            Name = "CompanyId",
+                            Value = 1
+                        },
+                        new EventParameter()
+                        {
+                            Name = "Value3",
+                            Value = true
+                        },
+                        new EventParameter()
+                        {
+                            Name = "Value2",
+                            Value = "Test value"
+                        }
                     }
-                }
-            };
+                };
 
-            //var eventInstance2 = new EventInstance()
-            //{
-            //    Id = Guid.NewGuid().ToString(),
-            //    CreatedDateTime = DateTime.Now,
-            //    EventTypeId = "2",
-            //    Parameters = new List<EventParameter>()
-            //    {
-            //        new EventParameter()
-            //        {
-            //            Name = "Value1",
-            //            Value = 2
-            //        }
-            //    }
-            //};
+                // Save event
+                await _eventService.AddAsync(eventInstance1);
 
-            //var eventInstance3 = new EventInstance()
-            //{
-            //    Id = Guid.NewGuid().ToString(),
-            //    CreatedDateTime = DateTime.Now,
-            //    EventTypeId = "3",
-            //    Parameters = new List<EventParameter>()
-            //    {
-            //        new EventParameter()
-            //        {
-            //            Name = "Value1",
-            //            Value = 3
-            //        }
-            //    }
-            //};
-
-            _eventQueueService.Add(eventInstance1);
+                // Add event to queue for processing
+                _eventQueueService.Add(eventInstance1);
+            }
 
             return Ok();
         }

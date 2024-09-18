@@ -1,6 +1,5 @@
 ﻿using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
-using System.Reflection.Metadata.Ecma335;
 
 namespace CFEventHandler.Services
 {

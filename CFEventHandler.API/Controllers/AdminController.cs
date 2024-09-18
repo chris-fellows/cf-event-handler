@@ -23,6 +23,7 @@ namespace CFEventHandler.API.Controllers
     //[SwaggerTag("Controller for admin functions")]
     public class AdminController : ControllerBase
     {
+        private readonly IDatabaseAdmin _databaseAdmin;
         private readonly IEventClientService _eventClientService;
         private readonly IEventHandlerRuleService _eventHandlerRuleService;
         private readonly IEventHandlerService _eventHandlerService;
@@ -38,7 +39,8 @@ namespace CFEventHandler.API.Controllers
         private readonly ISQLSettingsService _sqlSettingsService;
         private readonly ITeamsSettingsService _teamsSettingsService;
 
-        public AdminController(IEventClientService eventClientService, 
+        public AdminController(IDatabaseAdmin databaseAdmin,
+                        IEventClientService eventClientService, 
                         IEventHandlerRuleService eventHandlerRuleService,
                         IEventHandlerService eventHandlerService,
                         IEventTypeService eventTypeService, 
@@ -52,6 +54,7 @@ namespace CFEventHandler.API.Controllers
                         ISQLSettingsService sqlSettingsService,
                         ITeamsSettingsService teamsSettingsService)
         {
+            _databaseAdmin = databaseAdmin;
             _eventClientService = eventClientService;
             _eventHandlerRuleService = eventHandlerRuleService;
             _eventHandlerService = eventHandlerService;
@@ -75,26 +78,7 @@ namespace CFEventHandler.API.Controllers
         [Route("CreateData")]
         public async Task<IActionResult> CreateData()
         {
-            // Base data
-            await _eventClientService.ImportAsync(new EventClientSeed1());
-            await _eventHandlerService.ImportAsync(new EventHandlerSeed1());
-            await _eventTypeService.ImportAsync(new EventTypeSeed1());
-
-            // Event settings
-            await _consoleSettingsService.ImportAsync(new ConsoleEventSettingsSeed1());
-            await _csvSettingsService.ImportAsync(new CSVEventSettingsSeed1());
-            await _emailSettingsService.ImportAsync(new EmailEventSettingsSeed1());
-            await _httpSettingsService.ImportAsync(new HTTPEventSettingsSeed1());
-            await _processSettingsService.ImportAsync(new ProcessEventSettingsSeed1());
-            await _smsSettingsService.ImportAsync(new SMSEventSettingsSeed1());
-            await _sqlSettingsService.ImportAsync(new SQLEventSettingsSeed1());
-            await _teamsSettingsService.ImportAsync(new TeamsEventSettingsSeed1());
-
-            // Event handler rules. Needs to be done at the end because it depends on event settings etc
-            await _eventHandlerRuleService.ImportAsync(new EventHandlerRuleSeed1(_consoleSettingsService, _csvSettingsService,
-                           _emailSettingsService,  _eventHandlerService, _eventTypeService,
-                           _httpSettingsService, _processSettingsService, _signalRSettingsService,
-                           _smsSettingsService, _sqlSettingsService, _teamsSettingsService ));
+            await _databaseAdmin.LoadData(1); 
 
             return Ok();
         }

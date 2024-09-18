@@ -2,6 +2,7 @@ using CFEventHandler.API.Extensions;
 using CFEventHandler.API.HealthCheck;
 using CFEventHandler.API.Hubs;
 using CFEventHandler.API.Interfaces;
+using CFEventHandler.API.Models;
 using CFEventHandler.API.Services;
 using CFEventHandler.Console;
 using CFEventHandler.CSV;
@@ -13,13 +14,12 @@ using CFEventHandler.Services;
 using CFEventHandler.SignalR;
 using CFEventHandler.SMS;
 using CFEventHandler.SQL;
+using CFEventHandler.SystemTasks;
 using CFEventHandler.Teams;
+using CFUtilities.Utilities;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using CFEventHandler.Common.Email;
-using CFEventHandler.API.Models;
 using Microsoft.Extensions.Options;
-using CFEventHandler.Common.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -88,8 +88,35 @@ builder.Services.AddScoped<IRequestInfoService, RequestInfoService>();
 // Set event queue
 builder.Services.AddSingleton<IEventQueueService, MemoryEventQueueService>();
 
+// Set system tasks list
+builder.Services.AddSingleton<ISystemTasks>((scope) =>
+{
+    var systemTasks = new List<ISystemTask>()
+    {
+        /*
+        new DeleteOldEventsTask(new SystemTaskSchedule() 
+            { 
+                ExecuteFrequency = TimeSpan.FromHours(12), 
+                LastExecuteTime = DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow)
+            })
+        */
+        /*
+        new RandomEventsTask(new SystemTaskSchedule()
+            {
+                ExecuteFrequency = TimeSpan.FromSeconds(30),
+                LastExecuteTime = DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow)
+            })
+        */
+    };
+    systemTasks.RemoveAll(st => st == null);
+    return new SystemTasks(systemTasks);
+});
+
 // Set background service for processing events
 builder.Services.AddHostedService<EventBackgroundService>();
+
+// Add background processing
+builder.Services.AddHostedService<SystemTaskBackgroundService>();
 
 // Register all event handlers
 builder.Services.RegisterAllTypes<IEventHandler>(new[] { typeof(IEventHandler).Assembly });

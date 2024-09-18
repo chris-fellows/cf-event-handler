@@ -19,7 +19,7 @@ namespace CFEventHandler.Console
 
         public void Handle(EventInstance eventInstance, string eventSettingsId)
         {
-            var eventSettings = _consoleSettingsService.GetByIdAsync(eventSettingsId).Result;
+            //var eventSettings = _consoleSettingsService.GetByIdAsync(eventSettingsId).Result;
 
             System.Console.WriteLine($"{eventInstance.CreatedDateTime} {eventInstance.EventTypeId}");
         }

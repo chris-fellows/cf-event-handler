@@ -40,5 +40,12 @@ namespace CFEventHandler.Interfaces
         /// <param name="eventFilter"></param>
         /// <returns></returns>
         Task<List<EventInstance>> GetByFilter(EventFilter eventFilter);
+
+        /// <summary>
+        /// Deletes events by filter
+        /// </summary>
+        /// <param name="eventFilter"></param>
+        /// <returns></returns>
+        Task DeleteByFilter(EventFilter eventFilter);
     }
 }

@@ -62,7 +62,54 @@ namespace CFEventHandler.Services
 
         public async Task<List<EventInstance>> GetByFilter(EventFilter eventFilter)
         {
-            return new List<EventInstance>();           
+            // Set date range filter
+            var filter = Builders<EventInstance>.Filter.Gte(x => x.CreatedDateTime, eventFilter.FromCreatedDateTime.UtcDateTime);
+            filter = filter & Builders<EventInstance>.Filter.Lte(x => x.CreatedDateTime, eventFilter.ToCreatedDateTime.UtcDateTime);
+
+            /*
+            // Filter event types
+            if (eventFilter.EventTypeIds != null && eventFilter.EventTypeIds.Any())
+            {
+                filter = filter & Builders<EventInstance>.Filter.StringIn(x => x.EventTypeId, eventFilter.EventTypeIds.ToArray());
+            }
+            */
+
+            /*
+            // Filter event clients
+            if (eventFilter.EventClientIds != null && eventFilter.EventClientIds.Any())
+            {
+                filter = filter & Builders<EventInstance>.Filter.StringIn(x => x.EventClientId, eventFilter.EventClientIds.ToArray());
+            }
+            */
+
+            var events = await _eventInstances.FindAsync(filter);
+
+            return await events.ToListAsync();
+        }
+
+        public async Task DeleteByFilter(EventFilter eventFilter)
+        {
+            // Set date range filter
+            var filter = Builders<EventInstance>.Filter.Gte(x => x.CreatedDateTime, eventFilter.FromCreatedDateTime.UtcDateTime);
+            filter = filter & Builders<EventInstance>.Filter.Lte(x => x.CreatedDateTime, eventFilter.ToCreatedDateTime.UtcDateTime);
+
+            /*
+            // Filter event types
+            if (eventFilter.EventTypeIds != null && eventFilter.EventTypeIds.Any())
+            {
+                filter = filter & Builders<EventInstance>.Filter.StringIn(x => x.EventTypeId, eventFilter.EventTypeIds.ToArray());
+            }
+            */
+
+            /*
+            // Filter event clients
+            if (eventFilter.EventClientIds != null && eventFilter.EventClientIds.Any())
+            {
+                filter = filter & Builders<EventInstance>.Filter.StringIn(x => x.EventClientId, eventFilter.EventClientIds.ToArray());
+            }
+            */
+
+            await _eventInstances.DeleteManyAsync(filter);            
         }
     }
 }

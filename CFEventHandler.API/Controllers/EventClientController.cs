@@ -33,7 +33,7 @@ namespace CFEventHandler.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             // Get event clients
-            var eventClients = _eventClientService.GetAll();
+            var eventClients = _eventClientService.GetAll().OrderBy(ec => ec.Name).ToList();
 
             // Map models to DTO
             var eventClientDTOs = _mapper.Map<List<EventClientDTO>>(eventClients);
