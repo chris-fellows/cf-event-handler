@@ -1,4 +1,6 @@
-﻿using CFEventHandler.Console;
+﻿using CFEventHandler.API.Interfaces;
+using CFEventHandler.API.Security;
+using CFEventHandler.Console;
 using CFEventHandler.CSV;
 using CFEventHandler.Email;
 using CFEventHandler.HTTP;
@@ -10,6 +12,7 @@ using CFEventHandler.SignalR;
 using CFEventHandler.SMS;
 using CFEventHandler.SQL;
 using CFEventHandler.Teams;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,9 +23,12 @@ namespace CFEventHandler.API.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.Admin)]
     //[SwaggerTag("Controller for admin functions")]
     public class AdminController : ControllerBase
     {
+        private readonly IAPIKeyCacheService _apiKeyCacheService;
+        private readonly IAPIKeyService _apiKeyService;
         private readonly IDatabaseAdmin _databaseAdmin;
         private readonly IEventClientService _eventClientService;
         private readonly IEventHandlerRuleService _eventHandlerRuleService;
@@ -34,12 +40,15 @@ namespace CFEventHandler.API.Controllers
         private readonly IEmailSettingsService _emailSettingsService;
         private readonly IHTTPSettingsService _httpSettingsService;
         private readonly IProcessSettingsService _processSettingsService;
+        private readonly ISecurityAdmin _securityAdmin;
         private readonly ISignalRSettingsService _signalRSettingsService;
         private readonly ISMSSettingsService _smsSettingsService;
         private readonly ISQLSettingsService _sqlSettingsService;
         private readonly ITeamsSettingsService _teamsSettingsService;
 
-        public AdminController(IDatabaseAdmin databaseAdmin,
+        public AdminController(IAPIKeyCacheService apiKeyCacheService,
+                        IAPIKeyService apiKeyService,
+                        IDatabaseAdmin databaseAdmin,
                         IEventClientService eventClientService, 
                         IEventHandlerRuleService eventHandlerRuleService,
                         IEventHandlerService eventHandlerService,
@@ -49,11 +58,14 @@ namespace CFEventHandler.API.Controllers
                         IEmailSettingsService emailSettingsService, 
                         IHTTPSettingsService httpSettingsService, 
                         IProcessSettingsService processSettingsService, 
+                        ISecurityAdmin securityAdmin,
                         ISignalRSettingsService signalRSettingsService,
                         ISMSSettingsService smsSettingsService, 
                         ISQLSettingsService sqlSettingsService,
                         ITeamsSettingsService teamsSettingsService)
         {
+            _apiKeyCacheService = apiKeyCacheService;
+            _apiKeyService = apiKeyService;
             _databaseAdmin = databaseAdmin;
             _eventClientService = eventClientService;
             _eventHandlerRuleService = eventHandlerRuleService;
@@ -64,6 +76,7 @@ namespace CFEventHandler.API.Controllers
             _emailSettingsService = emailSettingsService;
             _httpSettingsService = httpSettingsService;
             _processSettingsService = processSettingsService;
+            _securityAdmin = securityAdmin;
             _signalRSettingsService = signalRSettingsService;
             _smsSettingsService = smsSettingsService;
             _sqlSettingsService = sqlSettingsService;
@@ -78,7 +91,10 @@ namespace CFEventHandler.API.Controllers
         [Route("CreateData")]
         public async Task<IActionResult> CreateData()
         {
-            await _databaseAdmin.LoadData(1); 
+            await _databaseAdmin.LoadData(1);
+
+            // Refresh API key cache
+            _securityAdmin.RefreshAPIKeyCache();
 
             return Ok();
         }

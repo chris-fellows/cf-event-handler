@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using CFEventHandler.API.Security;
 using CFEventHandler.Interfaces;
 using CFEventHandler.Models.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +13,7 @@ namespace CFEventHandler.API.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.Admin)]
     //[SwaggerTag("Controller for event handler data")]
     public class EventHandlerController : ControllerBase
     {

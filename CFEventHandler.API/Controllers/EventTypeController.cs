@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using CFEventHandler.API.Security;
 using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 using CFEventHandler.Models.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CFEventHandler.API.Controllers
@@ -11,6 +13,7 @@ namespace CFEventHandler.API.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.Admin)]
     //[SwaggerTag("Controller for event type data")]
     public class EventTypeController : ControllerBase
     {
@@ -70,6 +73,7 @@ namespace CFEventHandler.API.Controllers
         {
             // Map 
             var eventType = _mapper.Map<EventType>(eventTypeDTO);
+            eventType.Id = String.Empty;
 
             // Save
             await _eventTypeService.AddAsync(eventType);
@@ -91,6 +95,7 @@ namespace CFEventHandler.API.Controllers
         {            
             // Map 
             var eventType = _mapper.Map<EventType>(eventTypeDTO);
+            eventType.Id = id;
 
             // Get from DB
             var eventTypeDB = await _eventTypeService.GetByIdAsync(id);

@@ -20,7 +20,7 @@ namespace CFEventHandler.API.Utilities
         {
             return value.StartsWith(EncryptedPrefix) ?
                     Encoding.UTF8.GetString(TripleDESEncryption.DecryptByteArray(System.Convert.FromBase64String(value.Substring(EncryptedPrefix.Length)), Key)) :
-                    value;
+                    value;        
         }
 
         ///// <summary>

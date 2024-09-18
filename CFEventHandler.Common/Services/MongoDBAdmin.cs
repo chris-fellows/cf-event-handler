@@ -12,17 +12,23 @@ using CFEventHandler.SMS;
 using CFEventHandler.SQL;
 using CFEventHandler.Teams;
 using CFEventHandler.Seed;
+using CFEventHandler.Common.Seed;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CFEventHandler.Services
 {
     public class MongoDBAdmin : IDatabaseAdmin
     {
+        private readonly IAPIKeyService _apiKeyService;
         private readonly IDatabaseConfig _databaseConfig;
+        private readonly IDocumentTemplateService _documentTemplateService;
         private readonly IEventClientService _eventClientService;
         private readonly IEventHandlerRuleService _eventHandlerRuleService;
         private readonly IEventHandlerService _eventHandlerService;
         private readonly IEventService _eventService;
-        private readonly IEventTypeService _eventTypeService;        
+        private readonly IEventTypeService _eventTypeService;
+        
+        private readonly IServiceProvider _serviceProvider;
 
         // Event settings
         private readonly IConsoleSettingsService _consoleSettingsService;
@@ -35,7 +41,9 @@ namespace CFEventHandler.Services
         private readonly ISQLSettingsService _sqlSettingsService;
         private readonly ITeamsSettingsService _teamsSettingsService;
 
-        public MongoDBAdmin(IDatabaseConfig databaseConfig, 
+        public MongoDBAdmin(IAPIKeyService apiKeyService,
+                        IDatabaseConfig databaseConfig, 
+                        IDocumentTemplateService documentTemplateService,
                         IEventClientService eventClientService,
                         IEventHandlerRuleService eventHandlerRuleService,
                         IEventHandlerService eventHandlerService,
@@ -46,12 +54,15 @@ namespace CFEventHandler.Services
                         IEmailSettingsService emailSettingsService,
                         IHTTPSettingsService httpSettingsService,
                         IProcessSettingsService processSettingsService,
+                        IServiceProvider serviceProvider,
                         ISignalRSettingsService signalRSettingsService,
                         ISMSSettingsService smsSettingsService,
                         ISQLSettingsService sqlSettingsService,
                         ITeamsSettingsService teamsSettingsService)
         {
+            _apiKeyService = apiKeyService;
             _databaseConfig = databaseConfig;
+            _documentTemplateService = documentTemplateService;
             _eventClientService = eventClientService;
             _eventHandlerRuleService = eventHandlerRuleService;
             _eventHandlerService = eventHandlerService;
@@ -62,6 +73,7 @@ namespace CFEventHandler.Services
             _emailSettingsService = emailSettingsService;
             _httpSettingsService = httpSettingsService;
             _processSettingsService = processSettingsService;
+            _serviceProvider = serviceProvider;
             _signalRSettingsService = signalRSettingsService;
             _smsSettingsService = smsSettingsService;
             _sqlSettingsService = sqlSettingsService;
@@ -74,12 +86,20 @@ namespace CFEventHandler.Services
             var database = client.GetDatabase(_databaseConfig.DatabaseName);
 
             // Initialise collections
+            await InitialiseAPIKeys(database);
             await InitialiseEventClients(database);
             await InitialiseEventTypes(database);
             await InitialiseEventHandlers(database);
             await InitialiseEventHandlerRules(database);
             await InitialiseEvents(database);
-        }        
+        }
+
+        private async Task InitialiseAPIKeys(IMongoDatabase database)
+        {
+            var collection = database.GetCollection<APIKeyInstance>("api_keys");
+            var indexDefinitionName = Builders<APIKeyInstance>.IndexKeys.Ascending(x => x.Name);
+            await collection.Indexes.CreateOneAsync(new CreateIndexModel<APIKeyInstance>(indexDefinitionName));
+        }
 
         private async Task InitialiseEventClients(IMongoDatabase database)
         {
@@ -134,12 +154,14 @@ namespace CFEventHandler.Services
         }
         
         public async Task DeleteAllData()
-        {
+        {            
+            await _apiKeyService.DeleteAllAsync();
+            await _documentTemplateService.DeleteAllAsync();
             await _eventClientService.DeleteAllAsync();
             await _eventHandlerService.DeleteAllAsync();
             await _eventService.DeleteAllAsync();
-            await _eventTypeService.DeleteAllAsync();            
-
+            await _eventTypeService.DeleteAllAsync();
+            
             await _consoleSettingsService.DeleteAllAsync();
             await _csvSettingsService.DeleteAllAsync();
             await _emailSettingsService.DeleteAllAsync();
@@ -159,6 +181,8 @@ namespace CFEventHandler.Services
             await DeleteAllData();
 
             // Base data
+            await _apiKeyService.ImportAsync(new APIKeySeed1());
+            await _documentTemplateService.ImportAsync(new DocumentTemplateSeed1());
             await _eventClientService.ImportAsync(new EventClientSeed1());
             await _eventHandlerService.ImportAsync(new EventHandlerSeed1());
             await _eventTypeService.ImportAsync(new EventTypeSeed1());
@@ -166,7 +190,7 @@ namespace CFEventHandler.Services
             // Event settings
             await _consoleSettingsService.ImportAsync(new ConsoleEventSettingsSeed1());
             await _csvSettingsService.ImportAsync(new CSVEventSettingsSeed1());
-            await _emailSettingsService.ImportAsync(new EmailEventSettingsSeed1());
+            await _emailSettingsService.ImportAsync(new EmailEventSettingsSeed1(_documentTemplateService));
             await _httpSettingsService.ImportAsync(new HTTPEventSettingsSeed1());
             await _processSettingsService.ImportAsync(new ProcessEventSettingsSeed1());
             await _smsSettingsService.ImportAsync(new SMSEventSettingsSeed1());

@@ -16,21 +16,21 @@ namespace CFEventHandler.Services
             _documentTemplates = database.GetCollection<DocumentTemplate>("document_templates");
         }
 
-        //public async Task ImportAsync(IEntityList<EmailEventSettings> eventSettingsList)
-        //{
-        //    using (var session = await _client.StartSessionAsync())
-        //    {
-        //        session.StartTransaction();
-        //        await _eventSettings.InsertManyAsync(eventSettingsList.ReadAllAsync().Result);
-        //        await session.CommitTransactionAsync();
-        //    }
-        //}
+        public async Task ImportAsync(IEntityList<DocumentTemplate> documentTemplateList)
+        {
+            using (var session = await _client.StartSessionAsync())
+            {
+                session.StartTransaction();
+                await _documentTemplates.InsertManyAsync(documentTemplateList.ReadAllAsync().Result);
+                await session.CommitTransactionAsync();
+            }
+        }
 
-        //public Task ExportAsync(IEntityList<EmailEventSettings> eventSettingsList)
-        //{
-        //    eventSettingsList.WriteAllAsync(GetAll().ToList());
-        //    return Task.CompletedTask;
-        //}
+        public Task ExportAsync(IEntityList<DocumentTemplate> documentTemplateList)
+        {
+            documentTemplateList.WriteAllAsync(GetAll().ToList());
+            return Task.CompletedTask;
+        }
 
         public IEnumerable<DocumentTemplate> GetAll()
         {

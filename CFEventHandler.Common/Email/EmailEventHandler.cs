@@ -25,9 +25,7 @@ namespace CFEventHandler.Email
         }
 
         public void Handle(EventInstance eventInstance, string eventSettingsId)
-        {
-            return; // Do nothing
-
+        {            
             // Get event settings
             var eventSettings = _emailSettingsService.GetByIdAsync(eventSettingsId).Result;
 

@@ -4,6 +4,8 @@ using CFEventHandler.Models.DTO;
 using CFEventHandler.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using CFEventHandler.API.Security;
 
 namespace CFEventHandler.API.Controllers
 {
@@ -12,6 +14,7 @@ namespace CFEventHandler.API.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.Admin)]
     //[SwaggerTag("Controller for event client data")]
     public class EventClientController : ControllerBase
     {
@@ -72,6 +75,7 @@ namespace CFEventHandler.API.Controllers
         {
             // Map 
             var eventClient = _mapper.Map<EventClient>(eventClientDTO);
+            eventClient.Id = String.Empty;
 
             // Save
             await _eventClientService.AddAsync(eventClient);
@@ -93,6 +97,7 @@ namespace CFEventHandler.API.Controllers
         {
             // Map 
             var eventClient = _mapper.Map<EventClient>(eventClientDTO);
+            eventClient.Id = id;
 
             // Get from DB
             var eventClientDB = await _eventClientService.GetByIdAsync(id);

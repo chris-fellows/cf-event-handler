@@ -3,7 +3,9 @@ using CFEventHandler.API.HealthCheck;
 using CFEventHandler.API.Hubs;
 using CFEventHandler.API.Interfaces;
 using CFEventHandler.API.Models;
+using CFEventHandler.API.Security;
 using CFEventHandler.API.Services;
+using CFEventHandler.Common.Services;
 using CFEventHandler.Console;
 using CFEventHandler.CSV;
 using CFEventHandler.Email;
@@ -16,10 +18,10 @@ using CFEventHandler.SMS;
 using CFEventHandler.SQL;
 using CFEventHandler.SystemTasks;
 using CFEventHandler.Teams;
-using CFUtilities.Utilities;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,13 +30,46 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Swagger config. Allow user to entry API key
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("APIKey", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter your API Key",
+        Name = "X-Api-Key",
+        Type = SecuritySchemeType.ApiKey
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "APIKey"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
 builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddHttpContextAccessor();  // For IRequestInfoService
 builder.Services.AddSignalR();
+
+// CMF Added
+builder.Services.AddAuthentication().AddScheme<ApiKeyAuthOptions, ApiKeyAuthHandler>("APIKey", (options) =>
+{
+    //builder.Configuration.GetRequiredSection("ApiKeyOptions").Bind(options);
+});
+builder.Services.AddAuthorization();    // CMF Added (For API key)
 
 // Set health checks
 builder.Services.AddHealthChecks()
@@ -47,11 +82,14 @@ builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection(nameof(DatabaseConfig)));
 builder.Services.AddSingleton<IDatabaseConfig>(sp => sp.GetRequiredService<IOptions<DatabaseConfig>>().Value);
 
-// TODO: Remove this
-var dataFolder = @"D:\\Data\\Temp\\EventHandlerData";
+// Set cache for API keys
+builder.Services.AddSingleton<IAPIKeyCacheService, APIKeyCacheService>();
 
 // Document template processor
 builder.Services.AddScoped<IDocumentTemplateProcessor, DocumentTemplateProcessor>();
+
+// Security admin
+builder.Services.AddScoped<ISecurityAdmin, SecurityAdmin>();
 
 // Database admin
 builder.Services.AddScoped<IDatabaseAdmin, MongoDBAdmin>();
@@ -72,6 +110,7 @@ builder.Services.AddScoped<ISQLSettingsService, MongoDBSQLSettingsService>();
 builder.Services.AddScoped<ITeamsSettingsService, MongoDBTeamsSettingsService>();
 
 // General data services
+builder.Services.AddScoped<IAPIKeyService, MongoDBAPIKeyService>();
 builder.Services.AddScoped<IDocumentTemplateService, MongoDBDocumentTemplateService>();
 builder.Services.AddScoped<IEventClientService, MongoDBEventClientService>();
 builder.Services.AddScoped<IEventHandlerRuleService, MongoDBEventHandlerRuleService>();
@@ -143,11 +182,16 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Initialise database
+// Initialise
 using (var scope = app.Services.CreateScope())
 {    
+    // Initialise DB
     var databaseAdmin = scope.ServiceProvider.GetRequiredService<IDatabaseAdmin>();
-    await databaseAdmin.InitialiseAsync();    
+    await databaseAdmin.InitialiseAsync();
+
+    // Refresh API key cache
+    var securityAdmin = scope.ServiceProvider.GetRequiredService<ISecurityAdmin>();
+    securityAdmin.RefreshAPIKeyCache();
 }
 
 app.Run();

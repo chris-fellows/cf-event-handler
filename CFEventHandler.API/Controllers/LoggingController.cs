@@ -5,6 +5,8 @@ using CFEventHandler.Models;
 using CFEventHandler.Models.DTO;
 using CFEventHandler.Interfaces;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.AspNetCore.Authorization;
+using CFEventHandler.API.Security;
 
 namespace CFEventHandler.API.Controllers
 {
@@ -12,7 +14,7 @@ namespace CFEventHandler.API.Controllers
     /// Logging controller
     /// </summary>
     [Route("[controller]")]
-    [ApiController]
+    [ApiController]    
     //[SwaggerTag("Controller for logging events")]
     public class LoggingController : ControllerBase
     {
@@ -35,6 +37,7 @@ namespace CFEventHandler.API.Controllers
         /// <param name="eventInstanceDTO"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.WriteEvent)]
         public async Task<IActionResult> Log([FromBody] EventInstanceDTO eventInstanceDTO)
         {
             // Map from DTO to model
@@ -53,7 +56,8 @@ namespace CFEventHandler.API.Controllers
         /// Returns filtered list of events logged
         /// </summary>        
         /// <returns></returns>
-        [HttpGet]        
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.ReadEvent)]
         public async Task<IActionResult> GetFiltered([FromQuery] EventFilterDTO eventFilterDTO)
         {
             var eventFilter = _mapper.Map<EventFilter>(eventFilterDTO);

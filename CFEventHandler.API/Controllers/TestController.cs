@@ -1,6 +1,8 @@
-﻿using CFEventHandler.Interfaces;
+﻿using CFEventHandler.API.Security;
+using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 using CFEventHandler.Models.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +13,7 @@ namespace CFEventHandler.API.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.Admin)]
     public class TestController : ControllerBase
     {        
         private readonly IEventClientService _eventClientService;
@@ -27,14 +30,26 @@ namespace CFEventHandler.API.Controllers
             _eventQueueService = eventQueueService;
             _eventService = eventService;
             _eventTypeService = eventTypeService;
-        }     
+        }
+
+        /// <summary>
+        /// Tests API key
+        /// </summary>        
+        /// <returns></returns>        
+        [HttpPost]        
+        [Route("TestAPIKey")]
+        public async Task<IActionResult> TestAPIKey()
+        {
+            int xxx = 1000;
+            return Ok();
+        }
 
         /// <summary>
         /// Adds test log entries (1 or more)
         /// </summary>
         /// <param name="eventInstanceDTO"></param>
-        /// <returns></returns>
-        [HttpPost]
+        /// <returns></returns>        
+        [HttpPost]        
         [Route("AddLogs")]
         public async Task<IActionResult> Logs([FromQuery] int eventCount = 1)
         {          
