@@ -23,6 +23,8 @@ namespace CFEventHandler.API
             CreateMap<EventParameter, EventParameterDTO>().ReverseMap();
 
             CreateMap<EventType, EventTypeDTO>().ReverseMap();
+
+            //CreateMap<PagingInfo, PagingInfoDTO>().ReverseMap();
         }
     }
 }

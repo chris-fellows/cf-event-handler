@@ -5,6 +5,7 @@ using CFEventHandler.Models;
 using CFEventHandler.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace CFEventHandler.API.Controllers
 {
@@ -31,6 +32,8 @@ namespace CFEventHandler.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<EventTypeDTO>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> GetAll()
         {
             // Get event types
@@ -48,6 +51,8 @@ namespace CFEventHandler.API.Controllers
         /// <param name="id">Event Type Id</param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(EventTypeDTO))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> GetById(string id)
         {
             // Get event types

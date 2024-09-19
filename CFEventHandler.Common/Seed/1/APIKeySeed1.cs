@@ -16,8 +16,7 @@ namespace CFEventHandler.Common.Seed
                 EndTime = DateTimeOffset.UtcNow.AddDays(180),
                 Roles = new List<string>()
                 {
-                    "XXX",
-                    "Role1"
+                    "Admin"                    
                 }
             });
 
@@ -28,8 +27,7 @@ namespace CFEventHandler.Common.Seed
                 EndTime = DateTimeOffset.UtcNow.AddDays(180),
                 Roles = new List<string>()
                 {
-                    "XXX",
-                    "Role2"
+                    "Admin"
                 }
             });
 

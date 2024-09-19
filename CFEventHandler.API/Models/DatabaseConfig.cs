@@ -4,7 +4,7 @@ using CFEventHandler.Interfaces;
 namespace CFEventHandler.API.Models
 {
     public class DatabaseConfig : IDatabaseConfig
-    {
+    {        
         private string _connectionString = String.Empty;
         public string ConnectionString
         {

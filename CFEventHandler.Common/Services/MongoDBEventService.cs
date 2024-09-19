@@ -1,5 +1,7 @@
-﻿using CFEventHandler.Interfaces;
+﻿
+using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
+using CFUtilities.Utilities;
 using MongoDB.Driver;
 using System;
 
@@ -62,54 +64,65 @@ namespace CFEventHandler.Services
 
         public async Task<List<EventInstance>> GetByFilter(EventFilter eventFilter)
         {
-            // Set date range filter
-            var filter = Builders<EventInstance>.Filter.Gte(x => x.CreatedDateTime, eventFilter.FromCreatedDateTime.UtcDateTime);
-            filter = filter & Builders<EventInstance>.Filter.Lte(x => x.CreatedDateTime, eventFilter.ToCreatedDateTime.UtcDateTime);
+            if (eventFilter.PageItems < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(eventFilter.PageItems));
+            }
+            if (eventFilter.PageNo < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(eventFilter.PageNo));
+            }
 
-            /*
+            // Get filter definition
+            var filterDefinition = GetFilterDefinition(eventFilter);            
+
+            // Get filtered events page
+            var events = await _eventInstances.Find(filterDefinition)
+                            .SortBy(x => x.CreatedDateTime)                            
+                            .Skip(NumericUtilities.GetPageSkip(eventFilter.PageItems, eventFilter.PageNo))                           
+                            .Limit(eventFilter.PageItems)
+                            .ToListAsync();
+
+            //var events = await _eventInstances.FindAsync(filter);
+
+            return events;
+        }
+
+        /// <summary>
+        /// Returns MongoDB filter definition for EventFilter       
+        /// </summary>
+        /// <param name="eventFilter"></param>
+        /// <returns></returns>
+        private static FilterDefinition<EventInstance> GetFilterDefinition(EventFilter eventFilter)
+        {
+            // Set date range filter
+            var filterDefinition = Builders<EventInstance>.Filter.Gte(x => x.CreatedDateTime, eventFilter.FromCreatedDateTime.UtcDateTime);
+            filterDefinition = filterDefinition & Builders<EventInstance>.Filter.Lte(x => x.CreatedDateTime, eventFilter.ToCreatedDateTime.UtcDateTime);
+
             // Filter event types
             if (eventFilter.EventTypeIds != null && eventFilter.EventTypeIds.Any())
             {
-                filter = filter & Builders<EventInstance>.Filter.StringIn(x => x.EventTypeId, eventFilter.EventTypeIds.ToArray());
+                filterDefinition = filterDefinition & Builders<EventInstance>.Filter.In(x => x.EventTypeId, eventFilter.EventTypeIds.ToArray());
             }
-            */
 
-            /*
             // Filter event clients
             if (eventFilter.EventClientIds != null && eventFilter.EventClientIds.Any())
             {
-                filter = filter & Builders<EventInstance>.Filter.StringIn(x => x.EventClientId, eventFilter.EventClientIds.ToArray());
+                filterDefinition = filterDefinition & Builders<EventInstance>.Filter.In(x => x.EventClientId, eventFilter.EventClientIds.ToArray());
             }
-            */
 
-            var events = await _eventInstances.FindAsync(filter);
+            //var sort = Builders<EventInstance>.Sort.Ascending(x => x.CreatedDateTime);
 
-            return await events.ToListAsync();
+            return filterDefinition;
         }
 
         public async Task DeleteByFilter(EventFilter eventFilter)
-        {
-            // Set date range filter
-            var filter = Builders<EventInstance>.Filter.Gte(x => x.CreatedDateTime, eventFilter.FromCreatedDateTime.UtcDateTime);
-            filter = filter & Builders<EventInstance>.Filter.Lte(x => x.CreatedDateTime, eventFilter.ToCreatedDateTime.UtcDateTime);
+        {            
+            // Get filter definition
+            var filterDefinition = GetFilterDefinition(eventFilter);
 
-            /*
-            // Filter event types
-            if (eventFilter.EventTypeIds != null && eventFilter.EventTypeIds.Any())
-            {
-                filter = filter & Builders<EventInstance>.Filter.StringIn(x => x.EventTypeId, eventFilter.EventTypeIds.ToArray());
-            }
-            */
-
-            /*
-            // Filter event clients
-            if (eventFilter.EventClientIds != null && eventFilter.EventClientIds.Any())
-            {
-                filter = filter & Builders<EventInstance>.Filter.StringIn(x => x.EventClientId, eventFilter.EventClientIds.ToArray());
-            }
-            */
-
-            await _eventInstances.DeleteManyAsync(filter);            
+            // Delete
+            await _eventInstances.DeleteManyAsync(filterDefinition);            
         }
     }
 }

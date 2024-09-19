@@ -1,4 +1,5 @@
 ﻿using CFEventHandler.API.Security;
+using CFEventHandler.Exceptions;
 using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 using CFEventHandler.Models.DTO;
@@ -42,6 +43,84 @@ namespace CFEventHandler.API.Controllers
         {
             int xxx = 1000;
             return Ok();
+        }
+
+        /// <summary>
+        /// Test for no API key
+        /// </summary>        
+        /// <returns></returns>        
+        [HttpGet]
+        [Route("APIKey/None")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetNoAPIKey()
+        {
+            var data = new Dictionary<string, object>();
+            data.Add("Machine", Environment.MachineName);
+            data.Add("User", Environment.UserName);
+
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get request details
+        /// </summary>        
+        /// <returns></returns>        
+        [HttpGet]
+        [Route("Me")]
+        public async Task<IActionResult> GetMe()
+        {
+            var data = new Dictionary<string, object>();
+            data.Add("Machine", Environment.MachineName);
+            data.Add("User", Environment.UserName);
+
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Tests API key for Admin role
+        /// </summary>        
+        /// <returns></returns>        
+        [HttpGet]
+        [Route("APIKey/Roles/Admin")]
+        [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.Admin)]
+        public async Task<IActionResult> GetTestAPIKeyAdmin()
+        {                      
+            return Ok();
+        }
+
+        /// <summary>
+        /// Tests API key for ReadEvent role
+        /// </summary>        
+        /// <returns></returns>        
+        [HttpGet]
+        [Route("APIKey/Roles/ReadEvent")]
+        [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.ReadEvent)]
+        public async Task<IActionResult> GetTestAPIKeyReadEvent()
+        {
+            return Ok();
+        }
+
+        /// <summary>
+        /// Tests API key for WriteEvent role
+        /// </summary>        
+        /// <returns></returns>        
+        [HttpGet]
+        [Route("APIKey/Roles/WriteEvent")]
+        [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.WriteEvent)]
+        public async Task<IActionResult> GetTestAPIKeyWriteEvent()
+        {
+            return Ok();
+        }
+
+        /// <summary>
+        /// Tests unhandled error (Should get caught by ErrorMiddlewareService)
+        /// </summary>        
+        /// <returns></returns>        
+        [HttpPost]
+        [Route("TestUnhandledError")]
+        public async Task<IActionResult> TestUnhandledError()
+        {
+            throw new GeneralException("Test unhandled error");            
         }
 
         /// <summary>

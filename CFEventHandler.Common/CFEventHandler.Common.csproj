@@ -16,4 +16,8 @@
     <PackageReference Include="MongoDB.Driver" Version="2.28.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\cf-utilities-core\CFUtilities\CFUtilities.csproj" />
+  </ItemGroup>
+
 </Project>

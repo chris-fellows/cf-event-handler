@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CFEventHandler.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.Admin)]
     public class APIKeyController : ControllerBase

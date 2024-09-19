@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using CFEventHandler.API.Security;
+using System.Net;
 
 namespace CFEventHandler.API.Controllers
 {
@@ -33,6 +34,8 @@ namespace CFEventHandler.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<EventClientDTO>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> GetAll()
         {
             // Get event clients
@@ -50,6 +53,8 @@ namespace CFEventHandler.API.Controllers
         /// <param name="id">Event Client Id</param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(EventClientDTO))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> GetById(string id)
         {
             // Get event client

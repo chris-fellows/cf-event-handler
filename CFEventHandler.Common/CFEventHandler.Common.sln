@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CFEventHandler.Notification
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CFUtilities", "..\..\cf-utilities-core\CFUtilities\CFUtilities.csproj", "{31024DCC-EFD5-4FDA-B883-438A6A444E93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFEventHandler.xUnit", "..\CFEventHandler.xUnit\CFEventHandler.xUnit.csproj", "{25BF1072-441B-4B45-88BD-EDE59CC0026B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{31024DCC-EFD5-4FDA-B883-438A6A444E93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31024DCC-EFD5-4FDA-B883-438A6A444E93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31024DCC-EFD5-4FDA-B883-438A6A444E93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25BF1072-441B-4B45-88BD-EDE59CC0026B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25BF1072-441B-4B45-88BD-EDE59CC0026B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25BF1072-441B-4B45-88BD-EDE59CC0026B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25BF1072-441B-4B45-88BD-EDE59CC0026B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

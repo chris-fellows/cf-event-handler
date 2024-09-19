@@ -5,6 +5,7 @@ using CFEventHandler.API.Interfaces;
 using CFEventHandler.API.Models;
 using CFEventHandler.API.Security;
 using CFEventHandler.API.Services;
+using CFEventHandler.API.Utilities;
 using CFEventHandler.Common.Services;
 using CFEventHandler.Console;
 using CFEventHandler.CSV;
@@ -22,6 +23,13 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using System.Runtime.CompilerServices;
+
+// For tests:
+// 1) Add InternalsVisibleTo line.
+// 2) Add "partial" declaration for Program class so that it's visible to test project
+[assembly: InternalsVisibleTo("CFEventHandler.xUnit")]     // Allows test project to see this
+//var isTestsRunning = ConfigUtilities.IsTestsRunning;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -174,7 +182,7 @@ app.MapHealthChecks("/health");
 app.MapHub<NotificationHub>("/notificationhub");
 
 // Register middleware for unhandled exceptions
-//app.UseMiddleware<ErrorMiddlewareService>();
+app.UseMiddleware<ErrorMiddlewareService>();
 
 app.UseHttpsRedirection();
 
@@ -195,3 +203,5 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+public partial class Program { }   // Only needed so that class visible for unit tests

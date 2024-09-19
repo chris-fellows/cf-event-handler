@@ -7,6 +7,7 @@ using CFEventHandler.Interfaces;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using CFEventHandler.API.Security;
+using System.Net;
 
 namespace CFEventHandler.API.Controllers
 {
@@ -57,6 +58,8 @@ namespace CFEventHandler.API.Controllers
         /// </summary>        
         /// <returns></returns>
         [HttpGet]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<EventInstanceDTO>))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Authorize(AuthenticationSchemes = "APIKey", Roles = RoleNames.ReadEvent)]
         public async Task<IActionResult> GetFiltered([FromQuery] EventFilterDTO eventFilterDTO)
         {

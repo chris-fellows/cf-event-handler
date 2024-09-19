@@ -23,6 +23,15 @@ namespace CFEventHandler.API.Utilities
                     value;        
         }
 
+        //public static bool IsTestsRunning
+        //{
+        //    get
+        //    {
+        //        return AppDomain.CurrentDomain.GetAssemblies()
+        //                .Any(a => a.ManifestModule != null && a.ManifestModule.Name.Equals("CFEventHandler.xUnitTest.dll"));
+        //    }
+        //}
+
         ///// <summary>
         ///// Encrypts setting
         ///// </summary>

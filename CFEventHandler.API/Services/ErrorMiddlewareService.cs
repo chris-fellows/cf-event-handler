@@ -1,4 +1,5 @@
 ﻿using CFEventHandler.Exceptions;
+using CFEventHandler.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -37,8 +38,7 @@ namespace CFEventHandler.API.Services
                 
                 var returnObject = GetReturnObject(exception, context.Response.StatusCode);
 
-                //return context.Response.WriteAsync(JsonUtils.SerializeToString(returnObject, JsonUtils.GetDefaultJsonSerializerOptions()));
-                return null;
+                return context.Response.WriteAsync(JSONUtilities.SerializeToString(returnObject, JSONUtilities.DefaultJsonSerializerOptions));                
             }
             catch (Exception ex)
             {

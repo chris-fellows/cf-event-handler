@@ -11,6 +11,16 @@
 
         public static string PropertyMustBe(string propertyName, string values) => $"{propertyName} must be {values}";
 
+        public static string PropertyMustBeGreaterThan(string propertyName, string value, bool includingValue) =>
+                    includingValue ?
+                        $"{propertyName} must be {value} or greater" :
+                        $"{propertyName} must be greater than {value}";
+
+        public static string PropertyMustBeLessThan(string propertyName, string value, bool includingValue) =>
+                includingValue ?
+                    $"{propertyName} must be {value} or less" :
+                    $"{propertyName} must be less than {value}";
+
         public static string PropertyMustBeSet(string propertyName) => $"{propertyName} must be set";
 
         public static string PropertyReadOnly(string propertyName) => $"{propertyName} is read only";        
