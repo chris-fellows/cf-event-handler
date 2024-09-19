@@ -33,14 +33,14 @@ namespace CFEventHandler.xUnit
         [Fact]
         public async Task TestMeWorks()
         {
-            //// Test that correct appsettings.json is used
-            //using (var scope = _factory.Services.CreateScope())
-            //{
-            //    IDatabaseConfig databaseConfig = scope.ServiceProvider.GetRequiredService<IDatabaseConfig>();
-            //    Assert.Equal("event_handler_test", databaseConfig.DatabaseName);
+            // Test that correct appsettings.json is used
+            using (var scope = _factory.Services.CreateScope())
+            {
+                IDatabaseConfig databaseConfig = scope.ServiceProvider.GetRequiredService<IDatabaseConfig>();
+                Assert.Equal("event_handler_test", databaseConfig.DatabaseName);
 
-            //    int xxxx = 1000;
-            //}
+                int xxxx = 1000;
+            }
 
             //Act
             var client = _factory.CreateClient();
