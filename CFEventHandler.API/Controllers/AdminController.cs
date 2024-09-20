@@ -91,10 +91,17 @@ namespace CFEventHandler.API.Controllers
         [Route("CreateData")]
         public async Task<IActionResult> CreateData()
         {
-            await _databaseAdmin.LoadData(1);
+            try
+            {
+                await _databaseAdmin.LoadData(1);
 
-            // Refresh API key cache
-            _securityAdmin.RefreshAPIKeyCache();
+                // Refresh API key cache
+                _securityAdmin.RefreshAPIKeyCache();
+            }
+            catch(Exception exception)
+            {
+                throw;
+            }
 
             return Ok();
         }

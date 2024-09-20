@@ -1,4 +1,4 @@
-﻿namespace CFEventHandler.API.Interfaces
+﻿namespace CFEventHandler.Interfaces
 {
     public interface ISecurityAdmin
     {

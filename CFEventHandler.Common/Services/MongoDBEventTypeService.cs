@@ -9,7 +9,7 @@ namespace CFEventHandler.Services
         private readonly MongoClient? _client;
         private readonly IMongoCollection<EventType> _eventTypes;
         
-        public MongoDBEventTypeService(IDatabaseConfig databaseConfig)
+        public MongoDBEventTypeService(ITenantDatabaseConfig databaseConfig)
         {            
             _client = new MongoClient(databaseConfig.ConnectionString);
             var database = _client.GetDatabase(databaseConfig.DatabaseName);

@@ -31,7 +31,9 @@ namespace CFEventHandler.API.Security
 
             // Check if API key valid
             var apiKeyInstance = _apiKeyCacheService.GetById(apiKey);
-            if (apiKeyInstance == null || apiKeyInstance.EndTime < DateTimeOffset.UtcNow)
+            if (apiKeyInstance == null ||  
+                apiKeyInstance.StartTime > DateTimeOffset.UtcNow ||   // API key not started
+                apiKeyInstance.EndTime < DateTimeOffset.UtcNow)       // API key ended
             {
                 return Task.FromResult(AuthenticateResult.Fail("Invalid X-API-KEY"));
             }

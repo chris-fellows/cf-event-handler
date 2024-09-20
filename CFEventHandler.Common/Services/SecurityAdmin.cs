@@ -1,7 +1,6 @@
-﻿using CFEventHandler.API.Interfaces;
-using CFEventHandler.Interfaces;
+﻿using CFEventHandler.Interfaces;
 
-namespace CFEventHandler.API.Services
+namespace CFEventHandler.Services
 {
     public class SecurityAdmin : ISecurityAdmin
     {

@@ -10,7 +10,7 @@ namespace CFEventHandler.Services
     /// <typeparam name="TIDType"></typeparam>
     public abstract class CacheService<TEntityType, TIDType> : ICacheService<TEntityType, TIDType>
     {
-        private readonly Dictionary<TIDType, TEntityType> _cache = new Dictionary<TIDType, TEntityType>();
+        protected readonly Dictionary<TIDType, TEntityType> _cache = new Dictionary<TIDType, TEntityType>();
 
         public IEnumerable<TEntityType> GetAll()
         {

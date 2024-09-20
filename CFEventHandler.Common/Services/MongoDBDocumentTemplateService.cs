@@ -9,11 +9,19 @@ namespace CFEventHandler.Services
         private readonly MongoClient? _client;
         private readonly IMongoCollection<DocumentTemplate> _documentTemplates;
 
-        public MongoDBDocumentTemplateService(IDatabaseConfig databaseConfig)
+        public MongoDBDocumentTemplateService(ITenantDatabaseConfig databaseConfig)
         {
             _client = new MongoClient(databaseConfig.ConnectionString);
             var database = _client.GetDatabase(databaseConfig.DatabaseName);
-            _documentTemplates = database.GetCollection<DocumentTemplate>("document_templates");
+            try
+            {
+                _documentTemplates = database.GetCollection<DocumentTemplate>("document_templates");
+                int xxx = 1000;
+            }
+            catch(Exception exception)
+            {
+                throw exception;
+            }
         }
 
         public async Task ImportAsync(IEntityList<DocumentTemplate> documentTemplateList)

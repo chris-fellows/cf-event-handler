@@ -14,84 +14,83 @@ using CFEventHandler.Teams;
 using CFEventHandler.Seed;
 using CFEventHandler.Common.Seed;
 using Microsoft.Extensions.DependencyInjection;
+using CFUtilities.Encryption;
+using System.Text;
 
 namespace CFEventHandler.Services
 {
     public class MongoDBAdmin : IDatabaseAdmin
     {
         private readonly IAPIKeyService _apiKeyService;
-        private readonly IDatabaseConfig _databaseConfig;
-        private readonly IDocumentTemplateService _documentTemplateService;
-        private readonly IEventClientService _eventClientService;
-        private readonly IEventHandlerRuleService _eventHandlerRuleService;
-        private readonly IEventHandlerService _eventHandlerService;
-        private readonly IEventService _eventService;
-        private readonly IEventTypeService _eventTypeService;
+        private readonly IDatabaseConfig _databaseConfig;       
+        private readonly ITenantService _tenantService;
         
         private readonly IServiceProvider _serviceProvider;
 
-        // Event settings
-        private readonly IConsoleSettingsService _consoleSettingsService;
-        private readonly ICSVSettingsService _csvSettingsService;
-        private readonly IEmailSettingsService _emailSettingsService;
-        private readonly IHTTPSettingsService _httpSettingsService;
-        private readonly IProcessSettingsService _processSettingsService;
-        private readonly ISignalRSettingsService _signalRSettingsService;
-        private readonly ISMSSettingsService _smsSettingsService;
-        private readonly ISQLSettingsService _sqlSettingsService;
-        private readonly ITeamsSettingsService _teamsSettingsService;
+        private class MyTenantDatabaseConfig : ITenantDatabaseConfig
+        {
+            public string TenantId { get; set; } = String.Empty;
+
+            private string _connectionString = String.Empty;
+
+            // TODO: Clean this up
+            public string ConnectionString
+            {
+                set { _connectionString = value; }
+                get
+                {
+                    const string Key = "k8Bv29sHy0aYvAq56a";    // TODO: Move elsewhere (Environment variable etc)
+                    const string EncryptedPrefix = "\tEncrypted\t";
+                    return Encoding.UTF8.GetString(TripleDESEncryption.DecryptByteArray(System.Convert.FromBase64String(_connectionString.Substring(EncryptedPrefix.Length)), Key));
+                }
+            }
+
+            public string DatabaseName { get; set; } = String.Empty;
+        }
 
         public MongoDBAdmin(IAPIKeyService apiKeyService,
-                        IDatabaseConfig databaseConfig, 
-                        IDocumentTemplateService documentTemplateService,
-                        IEventClientService eventClientService,
-                        IEventHandlerRuleService eventHandlerRuleService,
-                        IEventHandlerService eventHandlerService,
-                        IEventService eventService,
-                        IEventTypeService eventTypeService,
-                        IConsoleSettingsService consoleSettingsService,
-                        ICSVSettingsService csvSettingsService,
-                        IEmailSettingsService emailSettingsService,
-                        IHTTPSettingsService httpSettingsService,
-                        IProcessSettingsService processSettingsService,
-                        IServiceProvider serviceProvider,
-                        ISignalRSettingsService signalRSettingsService,
-                        ISMSSettingsService smsSettingsService,
-                        ISQLSettingsService sqlSettingsService,
-                        ITeamsSettingsService teamsSettingsService)
+                        IDatabaseConfig databaseConfig,                       
+                        IServiceProvider serviceProvider,                        
+                        ITenantService tenantService)
         {
             _apiKeyService = apiKeyService;
-            _databaseConfig = databaseConfig;
-            _documentTemplateService = documentTemplateService;
-            _eventClientService = eventClientService;
-            _eventHandlerRuleService = eventHandlerRuleService;
-            _eventHandlerService = eventHandlerService;
-            _eventService = eventService;
-            _eventTypeService = eventTypeService;
-            _consoleSettingsService = consoleSettingsService;
-            _csvSettingsService = csvSettingsService;
-            _emailSettingsService = emailSettingsService;
-            _httpSettingsService = httpSettingsService;
-            _processSettingsService = processSettingsService;
-            _serviceProvider = serviceProvider;
-            _signalRSettingsService = signalRSettingsService;
-            _smsSettingsService = smsSettingsService;
-            _sqlSettingsService = sqlSettingsService;
-            _teamsSettingsService = teamsSettingsService;
+            _databaseConfig = databaseConfig;         
+            _serviceProvider = serviceProvider;            
+            _tenantService = tenantService;            
         }        
 
         public async Task InitialiseAsync()
-        {
+        {            
+            // Configure main DB
             var client = new MongoClient(_databaseConfig.ConnectionString);
             var database = client.GetDatabase(_databaseConfig.DatabaseName);
 
-            // Initialise collections
+            await InitialiseTenants(database);
             await InitialiseAPIKeys(database);
-            await InitialiseEventClients(database);
-            await InitialiseEventTypes(database);
-            await InitialiseEventHandlers(database);
-            await InitialiseEventHandlerRules(database);
-            await InitialiseEvents(database);
+
+            // Configure tenant datanases
+            var tenants = _tenantService.GetAll();
+            foreach (var tenant in tenants)
+            {
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    ITenantDatabaseConfig tenantDatabaseConfig = new MyTenantDatabaseConfig()
+                    {
+                        ConnectionString = tenant.ConnectionString,
+                        DatabaseName = tenant.DatabaseName,
+                    };
+
+                    var tenantClient = new MongoClient(tenantDatabaseConfig.ConnectionString);
+                    var tenantDatabase = tenantClient.GetDatabase(tenantDatabaseConfig.DatabaseName);
+
+                    // Initialise collections            
+                    await InitialiseEventClients(tenantDatabase);
+                    await InitialiseEventTypes(tenantDatabase);
+                    await InitialiseEventHandlers(tenantDatabase);
+                    await InitialiseEventHandlerRules(tenantDatabase);
+                    await InitialiseEvents(tenantDatabase);
+                }
+            }
         }
 
         private async Task InitialiseAPIKeys(IMongoDatabase database)
@@ -143,6 +142,13 @@ namespace CFEventHandler.Services
             //await collection.Indexes.CreateOneAsync(new CreateIndexModel<EventHandlerRule>(indexDefinition));
         }
 
+        private async Task InitialiseTenants(IMongoDatabase database)
+        {
+            var collection = database.GetCollection<Tenant>("tenants");
+            var indexDefinitionName = Builders<Tenant>.IndexKeys.Ascending(x => x.Name);
+            await collection.Indexes.CreateOneAsync(new CreateIndexModel<Tenant>(indexDefinitionName));
+        }
+
         public async Task LoadData(int group)
         {
             switch(group)
@@ -154,22 +160,75 @@ namespace CFEventHandler.Services
         }
         
         public async Task DeleteAllData()
-        {            
-            await _apiKeyService.DeleteAllAsync();
-            await _documentTemplateService.DeleteAllAsync();
-            await _eventClientService.DeleteAllAsync();
-            await _eventHandlerService.DeleteAllAsync();
-            await _eventService.DeleteAllAsync();
-            await _eventTypeService.DeleteAllAsync();
-            
-            await _consoleSettingsService.DeleteAllAsync();
-            await _csvSettingsService.DeleteAllAsync();
-            await _emailSettingsService.DeleteAllAsync();
-            await _httpSettingsService.DeleteAllAsync();
-            await _processSettingsService.DeleteAllAsync();
-            await _smsSettingsService.DeleteAllAsync();
-            await _sqlSettingsService.DeleteAllAsync();
-            await _teamsSettingsService.DeleteAllAsync();
+        {
+            // Configure main DB
+            var client = new MongoClient(_databaseConfig.ConnectionString);
+            var database = client.GetDatabase(_databaseConfig.DatabaseName);
+
+            // Load to main DB
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var tenantService = scope.ServiceProvider.GetRequiredService<ITenantService>();
+                var apiKeyService = scope.ServiceProvider.GetRequiredService<IAPIKeyService>();
+                var testCurrentTenantContext = scope.ServiceProvider.GetRequiredService<ICurrentTenantContext>();
+
+                await apiKeyService.DeleteAllAsync();
+                await tenantService.DeleteAllAsync();
+            }
+
+            // Load data in to tenant DBs
+            var tenants = _tenantService.GetAll();
+            foreach (var tenant in tenants)
+            {
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    // Set correct tenant for DI
+                    ITenantDatabaseConfig tenantDatabaseConfig = new MyTenantDatabaseConfig()
+                    {
+                        TenantId = tenant.Id,
+                        ConnectionString = tenant.ConnectionString,
+                        DatabaseName = tenant.DatabaseName
+                    };
+                    var currentTenantContext = scope.ServiceProvider.GetRequiredService<ICurrentTenantContext>();
+                    currentTenantContext.TenantDatabaseConfig = tenantDatabaseConfig;
+
+                    var documentTemplateService = scope.ServiceProvider.GetRequiredService<IDocumentTemplateService>();
+                    var eventClientService = scope.ServiceProvider.GetRequiredService<IEventClientService>();
+                    var eventHandlerService = scope.ServiceProvider.GetRequiredService<IEventHandlerService>();
+                    var eventHandlerRuleService = scope.ServiceProvider.GetRequiredService<IEventHandlerRuleService>();
+                    var eventTypeService = scope.ServiceProvider.GetRequiredService<IEventTypeService>();
+
+                    var consoleSettingsService = scope.ServiceProvider.GetRequiredService<IConsoleSettingsService>();
+                    var csvSettingsService = scope.ServiceProvider.GetRequiredService<ICSVSettingsService>();
+                    var emailSettingsService = scope.ServiceProvider.GetRequiredService<IEmailSettingsService>();
+                    var httpSettingsService = scope.ServiceProvider.GetRequiredService<IHTTPSettingsService>();
+                    var processSettingsService = scope.ServiceProvider.GetRequiredService<IProcessSettingsService>();
+                    var signalRSettingsService = scope.ServiceProvider.GetRequiredService<ISignalRSettingsService>();
+                    var smsSettingsService = scope.ServiceProvider.GetRequiredService<ISMSSettingsService>();
+                    var sqlSettingsService = scope.ServiceProvider.GetRequiredService<ISQLSettingsService>();
+                    var teamsSettingsService = scope.ServiceProvider.GetRequiredService<ITeamsSettingsService>();
+
+                    // Base data                    
+                    await documentTemplateService.DeleteAllAsync();
+                    await eventClientService.DeleteAllAsync();
+                    await eventHandlerService.DeleteAllAsync();
+                    await eventTypeService.DeleteAllAsync();
+
+                    // Event settings
+                    await consoleSettingsService.DeleteAllAsync();
+                    await csvSettingsService.DeleteAllAsync();
+                    await emailSettingsService.DeleteAllAsync();
+                    await httpSettingsService.DeleteAllAsync();
+                    await processSettingsService.DeleteAllAsync();
+                    await smsSettingsService.DeleteAllAsync();
+                    await sqlSettingsService.DeleteAllAsync();
+                    await teamsSettingsService.DeleteAllAsync();
+                    
+                    await eventHandlerRuleService.DeleteAllAsync();
+                }
+            }
+
+            int xxx = 1000;
         }
 
         /// <summary>
@@ -178,30 +237,80 @@ namespace CFEventHandler.Services
         /// <returns></returns>
         private async Task LoadData1()
         {
-            await DeleteAllData();
+            // Configure main DB
+            //var client = new MongoClient(_databaseConfig.ConnectionString);
+            //var database = client.GetDatabase(_databaseConfig.DatabaseName);
 
-            // Base data
-            await _apiKeyService.ImportAsync(new APIKeySeed1());
-            await _documentTemplateService.ImportAsync(new DocumentTemplateSeed1());
-            await _eventClientService.ImportAsync(new EventClientSeed1());
-            await _eventHandlerService.ImportAsync(new EventHandlerSeed1());
-            await _eventTypeService.ImportAsync(new EventTypeSeed1());
+            // Load to main DB
+            using (var scope = _serviceProvider.CreateScope())            
+            {
+                var tenantService = scope.ServiceProvider.GetRequiredService<ITenantService>();
+                var apiKeyService = scope.ServiceProvider.GetRequiredService<IAPIKeyService>();
+                var testCurrentTenantContext = scope.ServiceProvider.GetRequiredService<ICurrentTenantContext>();
 
-            // Event settings
-            await _consoleSettingsService.ImportAsync(new ConsoleEventSettingsSeed1());
-            await _csvSettingsService.ImportAsync(new CSVEventSettingsSeed1());
-            await _emailSettingsService.ImportAsync(new EmailEventSettingsSeed1(_documentTemplateService));
-            await _httpSettingsService.ImportAsync(new HTTPEventSettingsSeed1());
-            await _processSettingsService.ImportAsync(new ProcessEventSettingsSeed1());
-            await _smsSettingsService.ImportAsync(new SMSEventSettingsSeed1());
-            await _sqlSettingsService.ImportAsync(new SQLEventSettingsSeed1());
-            await _teamsSettingsService.ImportAsync(new TeamsEventSettingsSeed1());
+                apiKeyService.ImportAsync(new APIKeySeed1());
+                tenantService.ImportAsync(new TenantSeed1());
+            }
 
-            // Event handler rules. Needs to be done at the end because it depends on event settings etc
-            await _eventHandlerRuleService.ImportAsync(new EventHandlerRuleSeed1(_consoleSettingsService, _csvSettingsService,
-                           _emailSettingsService, _eventHandlerService, _eventTypeService,
-                           _httpSettingsService, _processSettingsService, _signalRSettingsService,
-                           _smsSettingsService, _sqlSettingsService, _teamsSettingsService));
+            // Load data in to tenant DBs
+            var tenants = _tenantService.GetAll();
+            
+            foreach (var tenant in tenants)
+            {
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    // Set correct tenant for DI
+                    ITenantDatabaseConfig tenantDatabaseConfig = new MyTenantDatabaseConfig()
+                    {
+                        TenantId = tenant.Id,
+                        ConnectionString = tenant.ConnectionString,
+                        DatabaseName = tenant.DatabaseName
+                    };
+                    var currentTenantContext = scope.ServiceProvider.GetRequiredService<ICurrentTenantContext>();
+                    currentTenantContext.TenantDatabaseConfig = tenantDatabaseConfig;
+
+                    var documentTemplateService = scope.ServiceProvider.GetRequiredService<IDocumentTemplateService>();
+                    var eventClientService = scope.ServiceProvider.GetRequiredService<IEventClientService>();
+                    var eventHandlerService = scope.ServiceProvider.GetRequiredService<IEventHandlerService>();
+                    var eventHandlerRuleService =scope.ServiceProvider.GetRequiredService<IEventHandlerRuleService>();
+                    var eventTypeService = scope.ServiceProvider.GetRequiredService<IEventTypeService>();
+
+                    var consoleSettingsService = scope.ServiceProvider.GetRequiredService<IConsoleSettingsService>();
+                    var csvSettingsService = scope.ServiceProvider.GetRequiredService<ICSVSettingsService>();
+                    var emailSettingsService = scope.ServiceProvider.GetRequiredService<IEmailSettingsService>();
+                    var httpSettingsService = scope.ServiceProvider.GetRequiredService<IHTTPSettingsService>();
+                    var processSettingsService = scope.ServiceProvider.GetRequiredService<IProcessSettingsService>();
+                    var signalRSettingsService = scope.ServiceProvider.GetRequiredService<ISignalRSettingsService>();
+                    var smsSettingsService = scope.ServiceProvider.GetRequiredService<ISMSSettingsService>();
+                    var sqlSettingsService = scope.ServiceProvider.GetRequiredService<ISQLSettingsService>();
+                    var teamsSettingsService = scope.ServiceProvider.GetRequiredService<ITeamsSettingsService>();
+
+                    // Base data                    
+                    await documentTemplateService.ImportAsync(new DocumentTemplateSeed1());
+                    await eventClientService.ImportAsync(new EventClientSeed1());
+                    await eventHandlerService.ImportAsync(new EventHandlerSeed1());
+                    await eventTypeService.ImportAsync(new EventTypeSeed1());
+                    
+                    // Event settings
+                    await consoleSettingsService.ImportAsync(new ConsoleEventSettingsSeed1());
+                    await csvSettingsService.ImportAsync(new CSVEventSettingsSeed1());
+                    await emailSettingsService.ImportAsync(new EmailEventSettingsSeed1(documentTemplateService));
+                    await httpSettingsService.ImportAsync(new HTTPEventSettingsSeed1());
+                    await processSettingsService.ImportAsync(new ProcessEventSettingsSeed1());
+                    await smsSettingsService.ImportAsync(new SMSEventSettingsSeed1());
+                    await sqlSettingsService.ImportAsync(new SQLEventSettingsSeed1());
+                    await teamsSettingsService.ImportAsync(new TeamsEventSettingsSeed1());
+
+                    // Event handler rules. Needs to be done at the end because it depends on event settings etc
+                    await eventHandlerRuleService.ImportAsync(new EventHandlerRuleSeed1(consoleSettingsService, csvSettingsService,
+                                   emailSettingsService, eventHandlerService, eventTypeService,
+                                   httpSettingsService, processSettingsService, signalRSettingsService,
+                                   smsSettingsService, sqlSettingsService, teamsSettingsService));
+                }
+            }
+
+            int xxx = 1000;
+            //await DeleteAllData();            
         }
     }
 }

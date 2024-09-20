@@ -7,9 +7,14 @@ namespace CFEventHandler.API.Interfaces
     /// </summary>
     public interface IRequestInfoService
     {
-        ///// <summary>
-        ///// API key in request
-        ///// </summary>
-        //APIKeyInstance APIKey { get; }
+        /// <summary>
+        /// Tenant Id
+        /// </summary>
+        string TenantId { get; }
+
+        /// <summary>
+        /// API key in request
+        /// </summary>
+        APIKeyInstance? APIKeyInstance { get; }
     }
 }

@@ -10,6 +10,8 @@
         /// </summary>
         string Name { get; }
 
+        bool IsRunOnStartup { get; }
+
         /// <summary>
         /// Task schedule
         /// </summary>

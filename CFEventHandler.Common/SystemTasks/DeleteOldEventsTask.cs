@@ -10,6 +10,8 @@ namespace CFEventHandler.SystemTasks
     public class DeleteOldEventsTask : ISystemTask
     {
         public string Name => "Delete old events";
+
+        public bool IsRunOnStartup => false;
         
         private readonly SystemTaskSchedule _schedule;
 

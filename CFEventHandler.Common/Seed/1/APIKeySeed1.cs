@@ -13,10 +13,11 @@ namespace CFEventHandler.Common.Seed
             {
                 Name = "API Key 1",
                 Key = "111111",
+                StartTime = DateTimeOffset.UtcNow,
                 EndTime = DateTimeOffset.UtcNow.AddDays(180),
                 Roles = new List<string>()
                 {
-                    "Admin"                    
+                    "Admin"
                 }
             });
 
@@ -24,6 +25,7 @@ namespace CFEventHandler.Common.Seed
             {
                 Name = "API Key 2",
                 Key = "222222",
+                StartTime = DateTimeOffset.UtcNow,
                 EndTime = DateTimeOffset.UtcNow.AddDays(180),
                 Roles = new List<string>()
                 {

@@ -1,4 +1,6 @@
 ﻿using CFEventHandler.Models;
+using CFEventHandler.Teams;
+using MongoDB.Driver;
 
 namespace CFEventHandler.Interfaces
 {
@@ -15,5 +17,7 @@ namespace CFEventHandler.Interfaces
         Task ImportAsync(IEntityList<EventHandlerRule> eventHandlerRuleList);
 
         IEnumerable<EventHandlerRule> GetAll();
+
+        Task DeleteAllAsync();        
     }
 }

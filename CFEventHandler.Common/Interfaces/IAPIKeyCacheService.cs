@@ -1,7 +1,6 @@
-﻿using CFEventHandler.Interfaces;
-using CFEventHandler.Models;
+﻿using CFEventHandler.Models;
 
-namespace CFEventHandler.API.Interfaces
+namespace CFEventHandler.Interfaces
 {
     /// <summary>
     /// Interface for API key cache

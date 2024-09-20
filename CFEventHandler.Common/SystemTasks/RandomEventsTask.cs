@@ -12,6 +12,8 @@ namespace CFEventHandler.SystemTasks
     {
         public string Name => "Random test events";
 
+        public bool IsRunOnStartup => false;
+
         private readonly SystemTaskSchedule _schedule;
 
         public RandomEventsTask(SystemTaskSchedule schedule)

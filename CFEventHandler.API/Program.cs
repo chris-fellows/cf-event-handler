@@ -12,6 +12,7 @@ using CFEventHandler.CSV;
 using CFEventHandler.Email;
 using CFEventHandler.HTTP;
 using CFEventHandler.Interfaces;
+using CFEventHandler.Models;
 using CFEventHandler.Process;
 using CFEventHandler.Services;
 using CFEventHandler.SignalR;
@@ -19,6 +20,7 @@ using CFEventHandler.SMS;
 using CFEventHandler.SQL;
 using CFEventHandler.SystemTasks;
 using CFEventHandler.Teams;
+using CFUtilities.Utilities;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Options;
@@ -93,6 +95,15 @@ builder.Services.AddSingleton<IDatabaseConfig>(sp => sp.GetRequiredService<IOpti
 // Set cache for API keys
 builder.Services.AddSingleton<IAPIKeyCacheService, APIKeyCacheService>();
 
+// Set cache for tenants
+builder.Services.AddSingleton<ITenantCacheService, TenantCacheService>();
+
+// Set current tenant context for resolving ITenantDatabaseConfig outside of HTTP pipeline
+builder.Services.AddScoped<ICurrentTenantContext, CurrentTenantContext>();
+
+// Set service for resolving ITenantDatabaseConfig
+builder.Services.AddScoped<ITenantDatabaseConfigService, TenantDatabaseConfigService>();
+
 // Document template processor
 builder.Services.AddScoped<IDocumentTemplateProcessor, DocumentTemplateProcessor>();
 
@@ -101,6 +112,9 @@ builder.Services.AddScoped<ISecurityAdmin, SecurityAdmin>();
 
 // Database admin
 builder.Services.AddScoped<IDatabaseAdmin, MongoDBAdmin>();
+
+// Tenant admin
+builder.Services.AddScoped<ITenantAdmin, TenantAdmin>();
 
 // Event settings service (JSON for the moment)
 builder.Services.AddScoped<IConsoleSettingsService, MongoDBConsoleSettingsService>();
@@ -125,6 +139,14 @@ builder.Services.AddScoped<IEventHandlerRuleService, MongoDBEventHandlerRuleServ
 builder.Services.AddScoped<IEventHandlerService, MongoDBEventHandlerService>();
 builder.Services.AddScoped<IEventService, MongoDBEventService>();
 builder.Services.AddScoped<IEventTypeService, MongoDBEventTypeService>();
+builder.Services.AddScoped<ITenantService, MongoDBTenantService>();
+
+// Register ITenantDatabaseConfig. Either gets tenant from HTTP context (if exists) otherwise from ICurrentTenantContext
+// which is used outside of HTTP requests.
+builder.Services.AddScoped<ITenantDatabaseConfig>((scope) =>
+{
+    return scope.GetRequiredService<ITenantDatabaseConfigService>().GetCurrent();    
+});
 
 // Set event manager that handles events
 builder.Services.AddScoped<IEventManagerService, EventManagerService>();
@@ -154,9 +176,24 @@ builder.Services.AddSingleton<ISystemTasks>((scope) =>
                 LastExecuteTime = DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow)
             })
         */
+         new SaveStatisticsTask(new SystemTaskSchedule()
+            {
+                ExecuteFrequency = TimeSpan.FromMinutes(15),
+                LastExecuteTime = DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow)
+         }),
+         new RefreshAPIKeyCacheTask(new SystemTaskSchedule()
+         {
+                ExecuteFrequency = TimeSpan.FromMinutes(60),
+                LastExecuteTime = DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow)
+         }),
+         new RefreshTenantCacheTask(new SystemTaskSchedule()
+         {
+                ExecuteFrequency = TimeSpan.FromMinutes(60),
+                LastExecuteTime = DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow)
+         }),
     };
     systemTasks.RemoveAll(st => st == null);
-    return new SystemTasks(systemTasks);
+    return new SystemTasks(systemTasks, 5);
 });
 
 // Set background service for processing events
@@ -192,14 +229,15 @@ app.MapControllers();
 
 // Initialise
 using (var scope = app.Services.CreateScope())
-{    
+{
     // Initialise DB
-    var databaseAdmin = scope.ServiceProvider.GetRequiredService<IDatabaseAdmin>();
-    await databaseAdmin.InitialiseAsync();
-
-    // Refresh API key cache
-    var securityAdmin = scope.ServiceProvider.GetRequiredService<ISecurityAdmin>();
-    securityAdmin.RefreshAPIKeyCache();
+    //var databaseAdmin = scope.ServiceProvider.GetRequiredService<IDatabaseAdmin>();
+    //await databaseAdmin.InitialiseAsync();
+    
+    // Execute system tasks that must execute before HTTP pipeline runs
+    var systemTaskBackgroundService = scope.ServiceProvider.GetServices<IHostedService>()
+                        .OfType<SystemTaskBackgroundService>().FirstOrDefault();
+    systemTaskBackgroundService.ExecuteStartupTasks(new CancellationTokenSource().Token).Wait();
 }
 
 app.Run();

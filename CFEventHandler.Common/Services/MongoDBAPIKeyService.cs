@@ -13,7 +13,7 @@ namespace CFEventHandler.Common.Services
         {
             _client = new MongoClient(databaseConfig.ConnectionString);
             var database = _client.GetDatabase(databaseConfig.DatabaseName);
-            _apiKeys = database.GetCollection<APIKeyInstance>("api_kets");
+            _apiKeys = database.GetCollection<APIKeyInstance>("api_keys");
         }
 
         public async Task ImportAsync(IEntityList<APIKeyInstance> apiKeys)

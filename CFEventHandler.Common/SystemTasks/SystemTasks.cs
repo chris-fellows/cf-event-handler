@@ -4,12 +4,16 @@ namespace CFEventHandler.SystemTasks
 {
     public class SystemTasks : ISystemTasks
     {
+        private readonly int _maxConcurrentTasks;
         private readonly List<ISystemTask> _systemTasks;
 
-        public SystemTasks(List<ISystemTask> systemTasks)
+        public SystemTasks(List<ISystemTask> systemTasks, int maxConcurrentTasks)
         {
+            _maxConcurrentTasks = maxConcurrentTasks;
             _systemTasks = systemTasks;
         }
+
+        public int MaxConcurrentTasks => _maxConcurrentTasks;
 
         public List<ISystemTask> AllTasks => _systemTasks;
 

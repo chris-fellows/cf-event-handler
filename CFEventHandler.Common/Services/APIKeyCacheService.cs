@@ -1,8 +1,8 @@
-﻿using CFEventHandler.API.Interfaces;
+﻿using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 using CFEventHandler.Services;
 
-namespace CFEventHandler.API.Services
+namespace CFEventHandler.Services
 {
     public class APIKeyCacheService : CacheService<APIKeyInstance, string>, IAPIKeyCacheService
     {

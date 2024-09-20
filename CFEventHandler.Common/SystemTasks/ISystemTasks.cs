@@ -6,6 +6,11 @@
     public interface ISystemTasks
     {
         /// <summary>
+        /// Max number of concurrent tasks allowed
+        /// </summary>
+        int MaxConcurrentTasks { get; }
+
+        /// <summary>
         /// All system tasks
         /// </summary>
         List<ISystemTask> AllTasks { get; }
