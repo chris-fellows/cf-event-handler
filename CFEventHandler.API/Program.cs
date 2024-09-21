@@ -1,3 +1,4 @@
+using AutoMapper;
 using CFEventHandler.API.Extensions;
 using CFEventHandler.API.HealthCheck;
 using CFEventHandler.API.Hubs;
@@ -12,6 +13,7 @@ using CFEventHandler.Enums;
 using CFEventHandler.HTTP;
 using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
+using CFEventHandler.Models.DTO;
 using CFEventHandler.Process;
 using CFEventHandler.Services;
 using CFEventHandler.SignalR;
@@ -239,6 +241,20 @@ app.MapControllers();
 // Initialise
 using (var scope = app.Services.CreateScope())
 {
+    /*
+    // Validate model by mapping to DTO and using DTO validator
+    var item = scope.ServiceProvider.GetRequiredService<CFEventHandler.API.Validators.EventTypeDTOValidator>();
+    var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+    EventType eventType = new EventType()
+    {
+        Id = Guid.NewGuid().ToString(),
+        Name = "Testyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+    };
+    var eventTypeDTO = mapper.Map<EventTypeDTO>(eventType);
+    var validationResult = item.Validate(eventTypeDTO);
+    int xxx = 1000;
+    */
+
     // Initialise shared DB
     var databaseAdminService = scope.ServiceProvider.GetRequiredService<IDatabaseAdminService>();       
     await databaseAdminService.InitialiseSharedAsync();

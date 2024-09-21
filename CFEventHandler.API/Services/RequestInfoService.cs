@@ -7,18 +7,16 @@ namespace CFEventHandler.API.Services
     public class RequestInfoService : IRequestInfoService
     {
         private readonly IAPIKeyCacheService _apiKeyCacheService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        //private readonly ITenantCacheService _tenantCacheService;
+        private readonly IHttpContextAccessor _httpContextAccessor;        
 
         public RequestInfoService(IAPIKeyCacheService apiKeyCacheService,
                                  IHttpContextAccessor httpContextAccessor)                                 
         {
             _apiKeyCacheService = apiKeyCacheService;
-            _httpContextAccessor = httpContextAccessor;
-            //_tenantCacheService = tenantCacheService;                       
+            _httpContextAccessor = httpContextAccessor;                                 
         }
 
-        public string TenantId
+        public string? TenantId
         {
             get
             {

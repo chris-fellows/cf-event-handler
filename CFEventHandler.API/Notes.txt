@@ -16,6 +16,10 @@ Dependency Injection
   set the tenant and then resolve the other services. Setting tenant ICurrentTenantContext causes DI resolution of
   ITenantDatabaseConfig to resolve the correct tenant.
 
+Models
+------
+- Internal models are mapped to DTO models for the API.
+
 System Tasks
 ------------
 - System tasks run in the background.

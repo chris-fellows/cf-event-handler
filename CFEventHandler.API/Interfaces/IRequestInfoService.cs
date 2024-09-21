@@ -10,7 +10,7 @@ namespace CFEventHandler.API.Interfaces
         /// <summary>
         /// Tenant Id
         /// </summary>
-        string TenantId { get; }
+        string? TenantId { get; }
 
         /// <summary>
         /// API key in request
