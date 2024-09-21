@@ -2,7 +2,7 @@
 
 namespace CFEventHandler.Teams
 {
-    public interface ITeamsSettingsService : IEventSettingsService<TeamsEventSettings>
+    public interface ITeamsSettingsService : IEntityWithIDService<TeamsEventSettings, string>
     {
         
     }

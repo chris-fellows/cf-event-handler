@@ -1,5 +1,4 @@
 ﻿using CFEventHandler.API.Interfaces;
-using CFEventHandler.API.Models;
 using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 

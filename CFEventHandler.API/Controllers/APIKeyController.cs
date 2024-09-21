@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using CFEventHandler.API.Interfaces;
 using CFEventHandler.API.Security;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
+using CFEventHandler.API.Validators;
 
 namespace CFEventHandler.API.Controllers
 {
@@ -17,122 +19,130 @@ namespace CFEventHandler.API.Controllers
     {
         private readonly IAPIKeyService _apiKeyService;
         private readonly IMapper _mapper;
-        private readonly ISecurityAdmin _securityAdmin;
+        private readonly IRequestInfoService _requestInfoService;
+        private readonly ISecurityAdminService _securityAdmin;
 
         public APIKeyController(IAPIKeyService apiKeyService,
                               IMapper mapper,
-                              ISecurityAdmin securityAdmin)
+                              IRequestInfoService requestInfoService,
+                              ISecurityAdminService securityAdmin)
         {
             _apiKeyService = apiKeyService;
             _mapper = mapper;
+            _requestInfoService = requestInfoService;
             _securityAdmin = securityAdmin;
         }
 
-        ///// <summary>
-        ///// Gets all event types
-        ///// </summary>
-        ///// <returns></returns>
-        //[HttpGet]
-        //public async Task<IActionResult> GetAll()
-        //{
-        //    // Get event types
-        //    var eventTypes = _eventTypeService.GetAll().OrderBy(et => et.Name).ToList();
+        /// <summary>
+        /// Gets API key by Id
+        /// </summary>
+        /// <param name="id">API Key Id</param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(APIKeyInstanceDTO))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        public async Task<IActionResult> GetById(string id)
+        {
+            // Get API key
+            var apiKeyInstance = await _apiKeyService.GetByIdAsync(id);
+            if (apiKeyInstance == null)
+            {
+                return NotFound();
+            }
 
-        //    // Map models to DTO
-        //    var eventTypeDTOs = _mapper.Map<List<EventTypeDTO>>(eventTypes);
+            // Map model to DTO
+            var apiKeyInstanceDTO = _mapper.Map<APIKeyInstanceDTO>(apiKeyInstance);
 
-        //    return Ok(eventTypeDTOs);
-        //}
+            return Ok(apiKeyInstanceDTO);
+        }
 
-        ///// <summary>
-        ///// Gets all event types
-        ///// </summary>
-        ///// <param name="id">Event Type Id</param>
-        ///// <returns></returns>
-        //[HttpGet("{id}")]
-        //public async Task<IActionResult> GetById(string id)
-        //{
-        //    // Get event types
-        //    var eventType = await _eventTypeService.GetByIdAsync(id);
-        //    if (eventType == null)
-        //    {
-        //        return NotFound();
-        //    }
+        /// <summary>
+        /// Create API key
+        /// </summary>
+        /// <param name="eventClientDTO"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> Add(APIKeyInstanceDTO apiKeyInstanceDTO)
+        {
+            // Map 
+            var apiKeyInstance = _mapper.Map<APIKeyInstance>(apiKeyInstanceDTO);
+            apiKeyInstance.Id = String.Empty;
+            apiKeyInstance.TenantId = _requestInfoService.TenantId; // Prevent updating another tenant
 
-        //    // Map model to DTO
-        //    var eventTypeDTO = _mapper.Map<EventTypeDTO>(eventType);
+            // Prevent duplicate key
+            var apiKeyInstances = _apiKeyService.GetAll().ToList();
+            if (apiKeyInstances.Any(a => a.Key == apiKeyInstanceDTO.Key))
+            {
+                return Problem(title: ValidationMessageFormatter.PropertyMustByUnique("Key"), statusCode: (int)HttpStatusCode.BadRequest);
+            }
 
-        //    return Ok(eventTypeDTO);
-        //}
+            // Prevent duplicate name
+            if (apiKeyInstances.Any(a => a.Name == apiKeyInstanceDTO.Name))
+            {
+                return Problem(title: ValidationMessageFormatter.PropertyMustByUnique("Name"), statusCode: (int)HttpStatusCode.BadRequest);
+            }
 
-        ///// <summary>
-        ///// Create event type
-        ///// </summary>
-        ///// <param name="eventTypeDTO"></param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //public async Task<IActionResult> Add(EventTypeDTO eventTypeDTO)
-        //{
-        //    // Map 
-        //    var eventType = _mapper.Map<EventType>(eventTypeDTO);
-        //    eventType.Id = String.Empty;
+            // Save
+            await _apiKeyService.AddAsync(apiKeyInstance);
 
-        //    // Save
-        //    await _eventTypeService.AddAsync(eventType);
+            // Map model to DTO
+            var newAPIKeyInstanceDTO = _mapper.Map<APIKeyInstanceDTO>(apiKeyInstance);
 
-        //    // Map model to DTO
-        //    var newEventTypeDTO = _mapper.Map<EventTypeDTO>(eventType);
+            return CreatedAtAction(nameof(GetById), new { id = newAPIKeyInstanceDTO.Id }, newAPIKeyInstanceDTO);
+        }
 
-        //    return CreatedAtAction(nameof(GetById), new { id = newEventTypeDTO.Id }, newEventTypeDTO);
-        //}
+        /// <summary>
+        /// Update API key
+        /// </summary>
+        /// <param name="eventClientDTO"></param>
+        /// <param name="id">API Key Id</param>
+        /// <returns></returns>
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(APIKeyInstanceDTO eventClientDTO, string id)
+        {
+            // Map 
+            var apiKeyInstance = _mapper.Map<APIKeyInstance>(eventClientDTO);
+            apiKeyInstance.Id = id;
+            apiKeyInstance.TenantId = _requestInfoService.TenantId; // Prevent updating another tenant
 
-        ///// <summary>
-        ///// Update event type
-        ///// </summary>
-        ///// <param name="eventTypeDTO"></param>
-        ///// <param name="id">Event Type Id</param>
-        ///// <returns></returns>
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> Update(EventTypeDTO eventTypeDTO, string id)
-        //{
-        //    // Map 
-        //    var eventType = _mapper.Map<EventType>(eventTypeDTO);
-        //    eventType.Id = id;
+            // Get from DB
+            var apiKeyInstanceDB = await _apiKeyService.GetByIdAsync(id);
+            if (apiKeyInstanceDB == null)
+            {
+                return NotFound();
+            }
 
-        //    // Get from DB
-        //    var eventTypeDB = await _eventTypeService.GetByIdAsync(id);
-        //    if (eventTypeDB == null)
-        //    {
-        //        return NotFound();
-        //    }
+            // Prevent key change to same as other API key
+            if (apiKeyInstance.Key != apiKeyInstanceDB.Key)  // Key changed
+            {
+                var apiKeyInstances = _apiKeyService.GetAll().ToList();
+                var apiKeyInstanceSame = apiKeyInstances.FirstOrDefault(a => a.Key == apiKeyInstance.Key &&
+                                                    a.Id != apiKeyInstanceDB.Id);
+                if (apiKeyInstanceSame != null)
+                {
+                    return Problem(title: ValidationMessageFormatter.PropertyMustByUnique("Key"), statusCode: (int)HttpStatusCode.BadRequest);
+                }
+            }
 
-        //    // Save
-        //    await _eventTypeService.AddAsync(eventType);
+            // Prevent name change to same as other API key
+            if (apiKeyInstance.Name != apiKeyInstanceDB.Name)  // Name changed
+            {
+                var apiKeyInstances = _apiKeyService.GetAll().ToList();
+                var apiKeyInstanceSame = apiKeyInstances.FirstOrDefault(a => a.Name == apiKeyInstance.Name &&
+                                                    a.Id != apiKeyInstanceDB.Id);
+                if (apiKeyInstanceSame != null)
+                {
+                    return Problem(title: ValidationMessageFormatter.PropertyMustByUnique("Name"), statusCode: (int)HttpStatusCode.BadRequest);
+                }
+            }
+        
+            // Save
+            await _apiKeyService.AddAsync(apiKeyInstance);
 
-        //    // Map model to DTO
-        //    var newEventTypeDTO = _mapper.Map<EventTypeDTO>(eventType);
+            // Map model to DTO
+            var newAPIKeyInstanceDTO = _mapper.Map<APIKeyInstanceDTO>(apiKeyInstance);
 
-        //    return Ok(newEventTypeDTO);
-        //}
-
-        ///// <summary>
-        ///// Delete event type
-        ///// </summary>
-        ///// <param name="id">Event Type Id</param>
-        ///// <returns></returns>
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> Delete(string id)
-        //{
-        //    var eventType = await _eventTypeService.GetByIdAsync(id);
-        //    if (eventType == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    // TODO: Check dependencies
-        //    await _eventTypeService.DeleteByIdAsync(eventType.Id);
-
-        //    return Ok();
-        //}
+            return Ok(newAPIKeyInstanceDTO);
+        }
     }
 }

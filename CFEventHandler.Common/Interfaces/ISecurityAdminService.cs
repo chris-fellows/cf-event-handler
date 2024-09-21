@@ -1,6 +1,6 @@
 ﻿namespace CFEventHandler.Interfaces
 {
-    public interface ISecurityAdmin
+    public interface ISecurityAdminService
     {
         void RefreshAPIKeyCache();
     }

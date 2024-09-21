@@ -2,7 +2,7 @@
 
 namespace CFEventHandler.Console
 {
-    public interface IConsoleSettingsService : IEventSettingsService<ConsoleEventSettings>
+    public interface IConsoleSettingsService : IEntityWithIDService<ConsoleEventSettings, string>
     {
         
     }

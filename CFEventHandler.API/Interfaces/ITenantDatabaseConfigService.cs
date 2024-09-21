@@ -2,6 +2,9 @@
 
 namespace CFEventHandler.API.Interfaces
 {
+    /// <summary>
+    /// Interface for ITenantDatabaseConfig
+    /// </summary>
     public interface ITenantDatabaseConfigService
     {
         /// <summary>

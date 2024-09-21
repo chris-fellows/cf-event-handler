@@ -25,5 +25,15 @@
         /// </summary>
         /// <returns></returns>
         List<ISystemTask> OverdueTasks { get; }
+
+        /// <summary>
+        /// All requests to execute system tasks
+        /// </summary>
+        List<SystemTaskRequest> AllRequests { get; }
+
+        /// <summary>
+        /// Overdue requests to execute system tasks
+        /// </summary>
+        List<SystemTaskRequest> OverdueRequests { get; }
     }
 }

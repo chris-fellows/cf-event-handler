@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CFEventHandler.API.Security;
+using CFEventHandler.API.Validators;
 using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 using CFEventHandler.Models.DTO;
@@ -80,6 +81,13 @@ namespace CFEventHandler.API.Controllers
             var eventType = _mapper.Map<EventType>(eventTypeDTO);
             eventType.Id = String.Empty;
 
+            // Prevent duplicate name
+            var eventTypes = _eventTypeService.GetAll().ToList();
+            if (eventTypes.Any(et => et.Name == eventType.Name))
+            {
+                return Problem(title: ValidationMessageFormatter.PropertyMustByUnique("Name"), statusCode: (int)HttpStatusCode.BadRequest);
+            }
+
             // Save
             await _eventTypeService.AddAsync(eventType);
 
@@ -107,6 +115,18 @@ namespace CFEventHandler.API.Controllers
             if (eventTypeDB == null)
             {
                 return NotFound();
+            }
+            
+            // Prevent name change to same name as other event type
+            if (eventType.Name != eventTypeDB.Name)  // Name changed
+            {
+                var eventTypes = _eventTypeService.GetAll().ToList();
+                var eventTypeSame = eventTypes.FirstOrDefault(et => et.Name == eventType.Name &&
+                                                    et.Id != eventTypeDB.Id);
+                if (eventTypeSame != null)
+                {
+                    return Problem(title: ValidationMessageFormatter.PropertyMustByUnique("Name"), statusCode: (int)HttpStatusCode.BadRequest);
+                }
             }
 
             // Save

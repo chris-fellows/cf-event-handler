@@ -1,6 +1,6 @@
 ﻿namespace CFEventHandler.Interfaces
 {
-    public interface ITenantAdmin
+    public interface ITenantAdminService
     {
         void RefreshTenantCache();
     }

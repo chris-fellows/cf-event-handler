@@ -95,3 +95,11 @@ Health Checks
 -------------
 The API health check is available from the /health endpoint
 
+API Security
+------------
+API requests require an API key to be specified.
+
+Multi-Tenancy
+-------------
+The API supports multi-tenancy. Shared data (E.g. Tenant list) is stored in the main DB and each tenant 
+has a separate database. The API in the request indicates the tenant.

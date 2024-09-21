@@ -5,35 +5,8 @@ namespace CFEventHandler.Interfaces
     /// <summary>
     /// Event instance service. Typically saves event for reporting.
     /// </summary>
-    public interface IEventService
-    {       
-        /// <summary>
-        /// Gets event by Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<EventInstance?> GetByIdAsync(string id);
-
-        /// <summary>
-        /// Adds event
-        /// </summary>
-        /// <param name="eventType"></param>
-        /// <returns></returns>
-        Task<EventInstance> AddAsync(EventInstance eventInstance);
-
-        /// <summary>
-        /// Deletes all event events
-        /// </summary>
-        /// <returns></returns>
-        Task DeleteAllAsync();
-
-        /// <summary>
-        /// Deletes event by Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task DeleteByIdAsync(string id);
-
+    public interface IEventService : IEntityWithIDService<EventInstance, string>
+    {            
         /// <summary>
         /// Gets events by filter
         /// </summary>

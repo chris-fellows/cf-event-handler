@@ -2,7 +2,7 @@
 
 namespace CFEventHandler.SignalR
 {
-    public interface ISignalRSettingsService : IEventSettingsService<SignalREventSettings>
+    public interface ISignalRSettingsService : IEntityWithIDService<SignalREventSettings, string>
     {
     }
 }

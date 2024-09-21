@@ -1,25 +1,25 @@
-﻿using CFEventHandler.Models;
+﻿//using CFEventHandler.Models;
 
-namespace CFEventHandler.Interfaces
-{
-    /// <summary>
-    /// Interface for event settings
-    /// </summary>
-    /// <typeparam name="TEntityType"></typeparam>
-    public interface IEventSettingsService<TEntityType>
-    {
-        Task ImportAsync(IEntityList<TEntityType> eventTypeList);
+//namespace CFEventHandler.Interfaces
+//{
+//    /// <summary>
+//    /// Interface for event settings
+//    /// </summary>
+//    /// <typeparam name="TEntityType"></typeparam>
+//    public interface IEventSettingsService<TEntityType>
+//    {
+//        Task ImportAsync(IEntityList<TEntityType> eventTypeList);
      
-        Task ExportAsync(IEntityList<TEntityType> eventTypeList);
+//        Task ExportAsync(IEntityList<TEntityType> eventTypeList);
 
-        IEnumerable<TEntityType> GetAll();
+//        IEnumerable<TEntityType> GetAll();
         
-        Task<TEntityType?> GetByIdAsync(string id);
+//        Task<TEntityType?> GetByIdAsync(string id);
 
-        Task<TEntityType> AddAsync(TEntityType entityType);
+//        Task<TEntityType> AddAsync(TEntityType entityType);
 
-        Task DeleteAllAsync();
+//        Task DeleteAllAsync();
 
-        Task DeleteByIdAsync(string id);
-    }
-}
+//        Task DeleteByIdAsync(string id);
+//    }
+//}

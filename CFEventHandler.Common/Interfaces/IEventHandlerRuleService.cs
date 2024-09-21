@@ -1,23 +1,12 @@
 ﻿using CFEventHandler.Models;
-using CFEventHandler.Teams;
-using MongoDB.Driver;
 
 namespace CFEventHandler.Interfaces
 {
     /// <summary>
-    /// Event handler rule service
+    /// Manages EventHandlerRule instances
     /// </summary>
-    public interface IEventHandlerRuleService
+    public interface IEventHandlerRuleService : IEntityWithIDService<EventHandlerRule, string>
     {
-        /// <summary>
-        /// Imports from list
-        /// </summary>
-        /// <param name="eventTypeList"></param>
-        /// <returns></returns>
-        Task ImportAsync(IEntityList<EventHandlerRule> eventHandlerRuleList);
-
-        IEnumerable<EventHandlerRule> GetAll();
-
-        Task DeleteAllAsync();        
+       
     }
 }

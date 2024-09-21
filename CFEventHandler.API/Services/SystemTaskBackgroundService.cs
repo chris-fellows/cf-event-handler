@@ -3,7 +3,12 @@
 namespace CFEventHandler.API.Services
 {
     /// <summary>
-    /// Background service for executing system tasks
+    /// Background service for executing system tasks.
+    /// 
+    /// The following types of system task are executed:
+    /// - During API startup. E.g. Tasks that need to execute before HTTP pipeline is processed.
+    /// - Scheduled intervals. E.g. Every 60 mins.
+    /// - Requested on demand. E.g. Refresh API key cache after new API key added.
     /// </summary>
     public class SystemTaskBackgroundService : BackgroundService
     {
@@ -33,13 +38,13 @@ namespace CFEventHandler.API.Services
         /// <returns></returns>
         private async Task HandleCompletedTasks(List<TaskInfo> taskInfos)
         {
-            //var completedTasks = taskInfos.Where(ti => ti.Task.IsCompleted).ToList();
+            var completedTasks = taskInfos.Where(ti => ti.Task.IsCompleted).ToList();
 
-            //while (completedTasks.Any())
-            //{
-            //    var completedTask = completedTasks.First();
-            //    completedTasks.Remove(completedTask);
-            //}
+            while (completedTasks.Any())
+            {
+                var completedTask = completedTasks.First();
+                completedTasks.Remove(completedTask);
+            }
         }
 
         /// <summary>
@@ -76,10 +81,76 @@ namespace CFEventHandler.API.Services
 
             // Wait for tasks to complete
             while (activeTaskInfos.Any())
-            {
-                // Check completed tasks
-                /await HandleCompletedTasks(activeTaskInfos);
+            {                
+                await HandleCompletedTasks(activeTaskInfos);
                 await Task.Delay(500);
+            }
+        }
+
+        /// <summary>
+        /// Executes overdue scheduled tasks
+        /// </summary>
+        /// <param name="activeTaskInfos"></param>
+        /// <param name="stoppingToken"></param>
+        /// <returns></returns>
+        private async Task ExecuteScheduledTasks(List<TaskInfo> activeTaskInfos, CancellationToken stoppingToken)
+        {
+            if (!stoppingToken.IsCancellationRequested &&
+                activeTaskInfos.Count < _systemTasks.MaxConcurrentTasks)
+            {
+                // Get overdue tasks
+                var overdueTasks = _systemTasks.OverdueTasks.Where(st => !activeTaskInfos.Any(ti => ti.SystemTask.Name == st.Name)).ToList();
+
+                // Start each overdue task, abort if max tasks executing
+                while (overdueTasks.Any() &&
+                    activeTaskInfos.Count < _systemTasks.MaxConcurrentTasks)
+                {
+                    // Get next task
+                    var systemTask = overdueTasks.First();
+                    overdueTasks.Remove(systemTask);
+
+                    // Start task
+                    CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                    var taskInfo = new TaskInfo()
+                    {
+                        Task = ExecuteSystemTaskAsync(cancellationTokenSource.Token, new Dictionary<string, object>(), systemTask),
+                        SystemTask = systemTask
+                    };
+                    activeTaskInfos.Add(taskInfo);                    
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes overdue requested tasks
+        /// </summary>
+        /// <returns></returns>
+        private async Task ExecuteRequestedTasks(List<TaskInfo> activeTaskInfos, CancellationToken stoppingToken)
+        {
+            if (!stoppingToken.IsCancellationRequested &&
+                activeTaskInfos.Count < _systemTasks.MaxConcurrentTasks)
+            {
+                // Get system task to execute, not already executing
+                var overdueTaskRequests = _systemTasks.OverdueRequests.Where(st => !activeTaskInfos.Any(ti => ti.SystemTask.Name == st.Name)).ToList();
+
+                // Execute system task
+                while (overdueTaskRequests.Any() &&
+                    activeTaskInfos.Count < _systemTasks.MaxConcurrentTasks)
+                {
+                    // Get next task request
+                    var systemTaskRequest = overdueTaskRequests.First();
+                    overdueTaskRequests.Remove(systemTaskRequest);                    
+                    var systemTask = _systemTasks.AllTasks.First(st => st.Name == systemTaskRequest.Name);
+
+                    // Start task
+                    CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                    var taskInfo = new TaskInfo()
+                    {
+                        Task = ExecuteSystemTaskAsync(cancellationTokenSource.Token, new Dictionary<string, object>(), systemTask),
+                        SystemTask = systemTask
+                    };
+                    activeTaskInfos.Add(taskInfo);                    
+                }
             }
         }
 
@@ -87,37 +158,24 @@ namespace CFEventHandler.API.Services
         {
             List<TaskInfo> activeTaskInfos = new List<TaskInfo>();
 
-            // Process system tasks until stopped
+            // Process system tasks until stopped. Ensure that active tasks are completed before leaving
             while (!stoppingToken.IsCancellationRequested ||
                     activeTaskInfos.Any())
             {
-                // Wait if too many active tasks
-                while (activeTaskInfos.Count >= _systemTasks.MaxConcurrentTasks)
-                {
-                    await HandleCompletedTasks(activeTaskInfos);
-                    await Task.Delay(500);
-                }
+                // Check completed tasks
+                await HandleCompletedTasks(activeTaskInfos);
+              
+                // Execute scheduled tasks                
+                await ExecuteScheduledTasks(activeTaskInfos, stoppingToken);                
 
-                // Get system task to execute, not already executing
-                var systemTaskToExecute = _systemTasks.OverdueTasks.FirstOrDefault(st => !activeTaskInfos.Any(ti => ti.SystemTask.Name == st.Name));
+                // Execute requested tasks                
+                await ExecuteRequestedTasks(activeTaskInfos, stoppingToken);                
 
-                // Execute system task
-                if (systemTaskToExecute != null)
-                {
-                    CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-                    var taskInfo = new TaskInfo()
-                    {
-                        Task = ExecuteSystemTaskAsync(cancellationTokenSource.Token, new Dictionary<string, object>(), systemTaskToExecute),
-                        SystemTask = systemTaskToExecute
-                    };
-                    activeTaskInfos.Add(taskInfo);
-                }
-            }
-
-            // Check completed tasks
-            //await HandleCompletedTasks(activeTaskInfos);
-
-            await Task.Delay(10000);
+                // Wait before next loop
+                await Task.Delay(activeTaskInfos.Any() ||
+                            _systemTasks.OverdueTasks.Any() ||
+                            _systemTasks.OverdueRequests.Any() ? 500 : 10000);
+            }            
         }
 
         /// <summary>

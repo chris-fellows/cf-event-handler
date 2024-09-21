@@ -11,21 +11,11 @@ namespace CFEventHandler.xUnit
     /// <summary>
     /// Tests for EventType security (API key access)
     /// </summary>
-    public class EventTypeSecurityTests : IClassFixture<WebApplicationFactory<Program>>
-    {
-        private readonly WebApplicationFactory<Program> _factory;
-
-        public EventTypeSecurityTests(WebApplicationFactory<Program> factory)
+    public class EventTypeSecurityTests : FactoryTestsBase, IClassFixture<WebApplicationFactory<Program>>
+    {        
+        public EventTypeSecurityTests(WebApplicationFactory<Program> factory) : base(factory)
         {
-            // Set local appsettings.json
-            var configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Test.json");
-            _factory = factory.WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureAppConfiguration((context, conf) =>
-                {
-                    conf.AddJsonFile(configPath);
-                });
-            });
+            
         }
 
         [Fact]

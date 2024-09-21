@@ -1,8 +1,9 @@
 ﻿using CFEventHandler.Interfaces;
+using CFEventHandler.Teams;
 
 namespace CFEventHandler.CSV
 {
-    public interface ICSVSettingsService : IEventSettingsService<CSVEventSettings>
+    public interface ICSVSettingsService : IEntityWithIDService<CSVEventSettings, string>
     {
         
     }

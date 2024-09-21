@@ -1,14 +1,8 @@
-﻿using CFEventHandler.HTTP;
-using CFEventHandler.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CFEventHandler.Interfaces;
 
 namespace CFEventHandler.Process
 {
-    public interface IProcessSettingsService : IEventSettingsService<ProcessEventSettings>
+    public interface IProcessSettingsService : IEntityWithIDService<ProcessEventSettings, string>
     {
     }
 }

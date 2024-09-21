@@ -1,8 +1,9 @@
 ﻿using CFEventHandler.Interfaces;
+using CFEventHandler.Teams;
 
 namespace CFEventHandler.Email
 {
-    public interface IEmailSettingsService : IEventSettingsService<EmailEventSettings>
+    public interface IEmailSettingsService : IEntityWithIDService<EmailEventSettings, string>
     {
         
     }

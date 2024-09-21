@@ -27,8 +27,8 @@ namespace CFEventHandler.SystemTasks
             {
                 _schedule.Executing = true;
 
-                var securityAdmin = serviceProvider.GetRequiredService<ISecurityAdmin>();
-                securityAdmin.RefreshAPIKeyCache();
+                var securityAdminService = serviceProvider.GetRequiredService<ISecurityAdminService>();
+                securityAdminService.RefreshAPIKeyCache();
             }
             finally
             {

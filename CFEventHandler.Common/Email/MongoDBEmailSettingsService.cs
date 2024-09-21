@@ -1,60 +1,30 @@
-﻿using CFEventHandler.Interfaces;
+﻿using CFEventHandler.CSV;
+using CFEventHandler.Interfaces;
+using CFEventHandler.Services;
 using MongoDB.Driver;
 
 namespace CFEventHandler.Email
 {
-    public class MongoDBEmailSettingsService : IEmailSettingsService
+    public class MongoDBEmailSettingsService : MongoDBBaseService<EmailEventSettings>, IEmailSettingsService
     {
-        private readonly MongoClient? _client;
-        private readonly IMongoCollection<EmailEventSettings> _eventSettings;
-
-        public MongoDBEmailSettingsService(IDatabaseConfig databaseConfig)
+        public MongoDBEmailSettingsService(ITenantDatabaseConfig databaseConfig) : base(databaseConfig, "email_event_settings")
         {
-            _client = new MongoClient(databaseConfig.ConnectionString);
-            var database = _client.GetDatabase(databaseConfig.DatabaseName);
-            _eventSettings = database.GetCollection<EmailEventSettings>("email_event_settings");
-        }
 
-        public async Task ImportAsync(IEntityList<EmailEventSettings> eventSettingsList)
-        {
-            using (var session = await _client.StartSessionAsync())
-            {
-                session.StartTransaction();
-                await _eventSettings.InsertManyAsync(eventSettingsList.ReadAllAsync().Result);
-                await session.CommitTransactionAsync();
-            }
-        }
-
-        public Task ExportAsync(IEntityList<EmailEventSettings> eventSettingsList)
-        {
-            eventSettingsList.WriteAllAsync(GetAll().ToList());
-            return Task.CompletedTask;
-        }
-
-        public IEnumerable<EmailEventSettings> GetAll()
-        {
-            return _eventSettings.Find(x => true).ToEnumerable();
         }
 
         public Task<EmailEventSettings?> GetByIdAsync(string id)
         {
-            return _eventSettings.Find(x => x.Id == id).FirstOrDefaultAsync();
+            return _entities.Find(x => x.Id == id).FirstOrDefaultAsync();
         }
 
-        public Task<EmailEventSettings> AddAsync(EmailEventSettings eventSettings)
+        public Task<EmailEventSettings?> GetByNameAsync(string name)
         {
-            _eventSettings.InsertOneAsync(eventSettings);
-            return Task.FromResult(eventSettings);
-        }
-
-        public async Task DeleteAllAsync()
-        {
-            await _eventSettings.DeleteManyAsync(Builders<EmailEventSettings>.Filter.Empty);
+            return _entities.Find(x => x.Name == name).FirstOrDefaultAsync();
         }
 
         public Task DeleteByIdAsync(string id)
         {
-            return _eventSettings.DeleteOneAsync(id);
+            return _entities.DeleteOneAsync(id);
         }
     }
 }

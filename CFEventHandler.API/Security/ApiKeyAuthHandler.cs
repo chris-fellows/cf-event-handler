@@ -1,4 +1,4 @@
-﻿using CFEventHandler.API.Interfaces;
+﻿using CFEventHandler.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;

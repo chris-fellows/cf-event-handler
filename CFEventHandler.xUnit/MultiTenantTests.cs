@@ -13,21 +13,11 @@ namespace CFEventHandler.xUnit
     /// <summary>
     /// Tests for multi-tenant
     /// </summary>
-    public class MultiTenantTests : IClassFixture<WebApplicationFactory<Program>>
+    public class MultiTenantTests : FactoryTestsBase, IClassFixture<WebApplicationFactory<Program>>
     {
-        private readonly WebApplicationFactory<Program> _factory;
-
-        public MultiTenantTests(WebApplicationFactory<Program> factory)
+        public MultiTenantTests(WebApplicationFactory<Program> factory) : base(factory)
         {
-            // Set local appsettings.json
-            var configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Test.json");
-            _factory = factory.WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureAppConfiguration((context, conf) =>
-                {
-                    conf.AddJsonFile(configPath);
-                });
-            });
+            
         }
 
         [Fact]

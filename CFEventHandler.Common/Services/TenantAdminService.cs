@@ -2,12 +2,12 @@
 
 namespace CFEventHandler.Services
 {
-    public class TenantAdmin : ITenantAdmin
+    public class TenantAdminService : ITenantAdminService
     {
         private readonly ITenantCacheService _tenantCacheService;
         private readonly ITenantService _tenantService;
         
-        public TenantAdmin(ITenantCacheService tenantCacheService,
+        public TenantAdminService(ITenantCacheService tenantCacheService,
             ITenantService tenantService)
         {
             _tenantCacheService = tenantCacheService;

@@ -11,21 +11,11 @@ namespace CFEventHandler.xUnit
     /// <summary>
     /// Tests for API keys
     /// </summary>
-    public class APIKeyTests : IClassFixture<WebApplicationFactory<Program>>
-    {
-        private readonly WebApplicationFactory<Program> _factory;
-
-        public APIKeyTests(WebApplicationFactory<Program> factory)
+    public class APIKeyTests : FactoryTestsBase,  IClassFixture<WebApplicationFactory<Program>>
+    {      
+        public APIKeyTests(WebApplicationFactory<Program> factory) : base(factory)
         {
-            // Set local appsettings.json
-            var configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Test.json");
-            _factory = factory.WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureAppConfiguration((context, conf) =>
-                {
-                    conf.AddJsonFile(configPath);
-                });
-            });
+        
         }
 
         [Fact]

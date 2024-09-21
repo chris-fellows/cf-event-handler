@@ -1,6 +1,6 @@
 ﻿using CFEventHandler.Interfaces;
 
-namespace CFEventHandler.API.Models
+namespace CFEventHandler.Models
 {
     public class TenantDatabaseConfig : DatabaseConfig, ITenantDatabaseConfig
     {

@@ -2,20 +2,11 @@
 
 namespace CFEventHandler.Interfaces
 {
-    public interface IDocumentTemplateService
+    /// <summary>
+    /// Manages DocumentTemplate instances
+    /// </summary>
+    public interface IDocumentTemplateService : IEntityWithIDService<DocumentTemplate, string>
     {        
-        Task ImportAsync(IEntityList<DocumentTemplate> documentTemplateList);
         
-        Task ExportAsync(IEntityList<DocumentTemplate> documentTemplateList);
-
-        IEnumerable<DocumentTemplate> GetAll();
-
-        Task<DocumentTemplate?> GetByIdAsync(string id);
-
-        Task<DocumentTemplate> AddAsync(DocumentTemplate emailTemplate);
-
-        Task DeleteAllAsync();
-
-        Task DeleteByIdAsync(string id);
     }
 }

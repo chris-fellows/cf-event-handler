@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using CFEventHandler.API.Security;
 using System.Net;
+using CFEventHandler.API.Validators;
 
 namespace CFEventHandler.API.Controllers
 {
@@ -82,6 +83,13 @@ namespace CFEventHandler.API.Controllers
             var eventClient = _mapper.Map<EventClient>(eventClientDTO);
             eventClient.Id = String.Empty;
 
+            // Prevent duplicate name
+            var eventClients = _eventClientService.GetAll().ToList();
+            if (eventClients.Any(ec => ec.Name == eventClient.Name))
+            {
+                return Problem(title: ValidationMessageFormatter.PropertyMustByUnique("Name"), statusCode: (int)HttpStatusCode.BadRequest);
+            }
+
             // Save
             await _eventClientService.AddAsync(eventClient);
 
@@ -109,6 +117,18 @@ namespace CFEventHandler.API.Controllers
             if (eventClientDB == null)
             {
                 return NotFound();
+            }
+
+            // Prevent name change to same name as other event client
+            if (eventClient.Name != eventClientDB.Name)  // Name changed
+            {
+                var eventClients = _eventClientService.GetAll().ToList();
+                var eventClientSame = eventClients.FirstOrDefault(ec => ec.Name == eventClient.Name &&
+                                                    ec.Id != eventClientDB.Id);
+                if (eventClientSame != null)
+                {
+                    return Problem(title: ValidationMessageFormatter.PropertyMustByUnique("Name"), statusCode: (int)HttpStatusCode.BadRequest);
+                }
             }
 
             // Save

@@ -2,14 +2,13 @@ using CFEventHandler.API.Extensions;
 using CFEventHandler.API.HealthCheck;
 using CFEventHandler.API.Hubs;
 using CFEventHandler.API.Interfaces;
-using CFEventHandler.API.Models;
 using CFEventHandler.API.Security;
 using CFEventHandler.API.Services;
-using CFEventHandler.API.Utilities;
 using CFEventHandler.Common.Services;
 using CFEventHandler.Console;
 using CFEventHandler.CSV;
 using CFEventHandler.Email;
+using CFEventHandler.Enums;
 using CFEventHandler.HTTP;
 using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
@@ -32,6 +31,8 @@ using System.Runtime.CompilerServices;
 // 2) Add "partial" declaration for Program class so that it's visible to test project
 [assembly: InternalsVisibleTo("CFEventHandler.xUnit")]     // Allows test project to see this
 //var isTestsRunning = ConfigUtilities.IsTestsRunning;
+
+DataLocationTypes dataLocationType = DataLocationTypes.MongoDB;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -108,38 +109,46 @@ builder.Services.AddScoped<ITenantDatabaseConfigService, TenantDatabaseConfigSer
 builder.Services.AddScoped<IDocumentTemplateProcessor, DocumentTemplateProcessor>();
 
 // Security admin
-builder.Services.AddScoped<ISecurityAdmin, SecurityAdmin>();
+builder.Services.AddScoped<ISecurityAdminService, SecurityAdminService>();
 
 // Database admin
-builder.Services.AddScoped<IDatabaseAdmin, MongoDBAdmin>();
+builder.Services.AddScoped<IDatabaseAdminService, DatabaseAdminService>();
 
 // Tenant admin
-builder.Services.AddScoped<ITenantAdmin, TenantAdmin>();
+builder.Services.AddScoped<ITenantAdminService, TenantAdminService>();
 
-// Event settings service (JSON for the moment)
-builder.Services.AddScoped<IConsoleSettingsService, MongoDBConsoleSettingsService>();
-builder.Services.AddScoped<ICSVSettingsService, MongoDBCSVSettingsService>();
-//builder.Services.AddScoped<ICustomSettingsService>((scope) =>
-//{
-//    return new JSONCustomSettingsService(Path.Combine(dataFolder, "CustomSettings"));
-//});
-builder.Services.AddScoped<IEmailSettingsService, MongoDBEmailSettingsService>();
-builder.Services.AddScoped<IHTTPSettingsService, MongoDBHTTPSettingsService>();
-builder.Services.AddScoped<IProcessSettingsService, MongoDBProcessSettingsService>();
-builder.Services.AddScoped<ISignalRSettingsService, MongoDBSignalRSettingsService>();
-builder.Services.AddScoped<ISMSSettingsService, MongoDBSMSSettingsService>();
-builder.Services.AddScoped<ISQLSettingsService, MongoDBSQLSettingsService>();
-builder.Services.AddScoped<ITeamsSettingsService, MongoDBTeamsSettingsService>();
+// Set data location specific services. For testing then we might want to use in memory data services.
+switch(dataLocationType)
+{
+    case DataLocationTypes.MongoDB:
+        // Set DB initializer
+        builder.Services.AddScoped<ISharedDatabaseConfigurer, MongoDBSharedConfigurer>();
+        builder.Services.AddScoped<ITenantDatabaseConfigurer, MongoDBTenantConfigurer>();
 
-// General data services
-builder.Services.AddScoped<IAPIKeyService, MongoDBAPIKeyService>();
-builder.Services.AddScoped<IDocumentTemplateService, MongoDBDocumentTemplateService>();
-builder.Services.AddScoped<IEventClientService, MongoDBEventClientService>();
-builder.Services.AddScoped<IEventHandlerRuleService, MongoDBEventHandlerRuleService>();
-builder.Services.AddScoped<IEventHandlerService, MongoDBEventHandlerService>();
-builder.Services.AddScoped<IEventService, MongoDBEventService>();
-builder.Services.AddScoped<IEventTypeService, MongoDBEventTypeService>();
-builder.Services.AddScoped<ITenantService, MongoDBTenantService>();
+        // Event settings service
+        builder.Services.AddScoped<IConsoleSettingsService, MongoDBConsoleSettingsService>();
+        builder.Services.AddScoped<ICSVSettingsService, MongoDBCSVSettingsService>();
+        builder.Services.AddScoped<IEmailSettingsService, MongoDBEmailSettingsService>();
+        builder.Services.AddScoped<IHTTPSettingsService, MongoDBHTTPSettingsService>();
+        builder.Services.AddScoped<IProcessSettingsService, MongoDBProcessSettingsService>();
+        builder.Services.AddScoped<ISignalRSettingsService, MongoDBSignalRSettingsService>();
+        builder.Services.AddScoped<ISMSSettingsService, MongoDBSMSSettingsService>();
+        builder.Services.AddScoped<ISQLSettingsService, MongoDBSQLSettingsService>();
+        builder.Services.AddScoped<ITeamsSettingsService, MongoDBTeamsSettingsService>();
+
+        // General data services
+        builder.Services.AddScoped<IAPIKeyService, MongoDBAPIKeyService>();
+        builder.Services.AddScoped<IDocumentTemplateService, MongoDBDocumentTemplateService>();
+        builder.Services.AddScoped<IEventClientService, MongoDBEventClientService>();
+        builder.Services.AddScoped<IEventHandlerRuleService, MongoDBEventHandlerRuleService>();
+        builder.Services.AddScoped<IEventHandlerService, MongoDBEventHandlerService>();
+        builder.Services.AddScoped<IEventService, MongoDBEventService>();
+        builder.Services.AddScoped<IEventTypeService, MongoDBEventTypeService>();
+        builder.Services.AddScoped<ITenantService, MongoDBTenantService>();
+        break;
+    default:
+        throw new NotSupportedException($"Data location {dataLocationType} not supported");
+}
 
 // Register ITenantDatabaseConfig. Either gets tenant from HTTP context (if exists) otherwise from ICurrentTenantContext
 // which is used outside of HTTP requests.
@@ -230,9 +239,17 @@ app.MapControllers();
 // Initialise
 using (var scope = app.Services.CreateScope())
 {
-    // Initialise DB
-    //var databaseAdmin = scope.ServiceProvider.GetRequiredService<IDatabaseAdmin>();
-    //await databaseAdmin.InitialiseAsync();
+    // Initialise shared DB
+    var databaseAdminService = scope.ServiceProvider.GetRequiredService<IDatabaseAdminService>();       
+    await databaseAdminService.InitialiseSharedAsync();
+
+    // Initialise tenant DBs
+    var tenantService = scope.ServiceProvider.GetService<ITenantService>();
+    var tenants = tenantService.GetAll();
+    foreach(var tenant in tenants)
+    {
+        await databaseAdminService.InitialiseTenantAsync(tenant.Id);
+    }
     
     // Execute system tasks that must execute before HTTP pipeline runs
     var systemTaskBackgroundService = scope.ServiceProvider.GetServices<IHostedService>()

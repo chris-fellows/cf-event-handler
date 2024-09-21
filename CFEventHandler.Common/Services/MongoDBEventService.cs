@@ -7,59 +7,26 @@ using System;
 
 namespace CFEventHandler.Services
 {
-    public class MongoDBEventService : IEventService
-    {
-        private readonly MongoClient _client;
-        private readonly IMongoCollection<EventInstance> _eventInstances;
-
-        public MongoDBEventService(ITenantDatabaseConfig databaseConfig)
+    public class MongoDBEventService : MongoDBBaseService<EventInstance>, IEventService
+    {        
+        public MongoDBEventService(ITenantDatabaseConfig databaseConfig) : base(databaseConfig, "events")
         {
-            _client = new MongoClient(databaseConfig.ConnectionString);
-            var database = _client.GetDatabase(databaseConfig.DatabaseName);
-            _eventInstances = database.GetCollection<EventInstance>("events");
+      
         }
-
-        public async Task ImportAsync(IEntityList<EventInstance> eventTypeList)
-        {
-            using (var session = await _client.StartSessionAsync())
-            {
-                session.StartTransaction();
-                await _eventInstances.InsertManyAsync(eventTypeList.ReadAllAsync().Result);
-                await session.CommitTransactionAsync();
-            }
-            //return _eventInstances.InsertManyAsync(eventTypeList.ReadAllAsync().Result);
-        }
-
-        public Task ExportAsync(IEntityList<EventInstance> eventTypeList)
-        {
-            eventTypeList.WriteAllAsync(GetAll().ToList());
-            return Task.CompletedTask;
-        }
-
-        public IEnumerable<EventInstance> GetAll()
-        {
-            return _eventInstances.Find(x => true).ToEnumerable();
-        }
-
+      
         public Task<EventInstance?> GetByIdAsync(string id)
         {
-            return _eventInstances.Find(x => x.Id == id).FirstOrDefaultAsync();
+            return _entities.Find(x => x.Id == id).FirstOrDefaultAsync();
         }
 
-        public Task<EventInstance> AddAsync(EventInstance eventInstance)
+        public Task<EventInstance?> GetByNameAsync(string name)
         {
-            _eventInstances.InsertOneAsync(eventInstance);
-            return Task.FromResult(eventInstance);
-        }
-
-        public async Task DeleteAllAsync()
-        {
-            await _eventInstances.DeleteManyAsync(Builders<EventInstance>.Filter.Empty);
+            return null;    // Event does not have Name property
         }
 
         public Task DeleteByIdAsync(string id)
         {
-            return _eventInstances.DeleteOneAsync(id);
+            return _entities.DeleteOneAsync(id);
         }
 
         public async Task<List<EventInstance>> GetByFilter(EventFilter eventFilter)
@@ -77,7 +44,7 @@ namespace CFEventHandler.Services
             var filterDefinition = GetFilterDefinition(eventFilter);            
 
             // Get filtered events page
-            var events = await _eventInstances.Find(filterDefinition)
+            var events = await _entities.Find(filterDefinition)
                             .SortBy(x => x.CreatedDateTime)                            
                             .Skip(NumericUtilities.GetPageSkip(eventFilter.PageItems, eventFilter.PageNo))                           
                             .Limit(eventFilter.PageItems)
@@ -122,7 +89,7 @@ namespace CFEventHandler.Services
             var filterDefinition = GetFilterDefinition(eventFilter);
 
             // Delete
-            await _eventInstances.DeleteManyAsync(filterDefinition);            
+            await _entities.DeleteManyAsync(filterDefinition);            
         }
     }
 }

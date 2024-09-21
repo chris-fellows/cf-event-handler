@@ -12,6 +12,8 @@ namespace CFEventHandler.API
     {
         public AutoMapperProfile()
         {
+            CreateMap<APIKeyInstance, APIKeyInstanceDTO>().ReverseMap();
+
             CreateMap<EventClient, EventClientDTO>().ReverseMap();
 
             CreateMap<EventFilter, EventFilterDTO>().ReverseMap();

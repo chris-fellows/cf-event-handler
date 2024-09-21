@@ -1,0 +1,22 @@
+﻿General
+-------
+- Use IRequestInfoService to access details of the HTTP request.
+
+Database
+--------
+- There are two types of database used:
+	- Shared database. Contains tenant list etc.
+	- Tenant database. Contains data for tenant.
+- To create a service that accesses the shared DB then pass IDatabaseConfig to the service constructor.
+- To create a service that accesses the tenant DB then pass ITenantDatabaseConfig to the service contructor.
+
+Dependency Injection
+--------------------
+- To resolve a tenant specific service outside of the HTTP pipeline then create a scope, get ICurrentTenantContext,
+  set the tenant and then resolve the other services. Setting tenant ICurrentTenantContext causes DI resolution of
+  ITenantDatabaseConfig to resolve the correct tenant.
+
+System Tasks
+------------
+- System tasks run in the background.
+- They can be executed at scheduled intervals or on demand (E.g. When data changes)

@@ -1,5 +1,6 @@
 ﻿using CFEventHandler.API.Interfaces;
 using CFEventHandler.API.Security;
+using CFEventHandler.API.Validators;
 using CFEventHandler.Console;
 using CFEventHandler.CSV;
 using CFEventHandler.Email;
@@ -15,6 +16,7 @@ using CFEventHandler.Teams;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace CFEventHandler.API.Controllers
 {
@@ -29,7 +31,7 @@ namespace CFEventHandler.API.Controllers
     {
         private readonly IAPIKeyCacheService _apiKeyCacheService;
         private readonly IAPIKeyService _apiKeyService;
-        private readonly IDatabaseAdmin _databaseAdmin;
+        private readonly IDatabaseAdminService _databaseAdminService;
         private readonly IEventClientService _eventClientService;
         private readonly IEventHandlerRuleService _eventHandlerRuleService;
         private readonly IEventHandlerService _eventHandlerService;
@@ -40,15 +42,16 @@ namespace CFEventHandler.API.Controllers
         private readonly IEmailSettingsService _emailSettingsService;
         private readonly IHTTPSettingsService _httpSettingsService;
         private readonly IProcessSettingsService _processSettingsService;
-        private readonly ISecurityAdmin _securityAdmin;
+        private readonly ISecurityAdminService _securityAdminService;
         private readonly ISignalRSettingsService _signalRSettingsService;
         private readonly ISMSSettingsService _smsSettingsService;
         private readonly ISQLSettingsService _sqlSettingsService;
         private readonly ITeamsSettingsService _teamsSettingsService;
+        private readonly ITenantService _tenantService;
 
         public AdminController(IAPIKeyCacheService apiKeyCacheService,
                         IAPIKeyService apiKeyService,
-                        IDatabaseAdmin databaseAdmin,
+                        IDatabaseAdminService databaseAdminService,
                         IEventClientService eventClientService, 
                         IEventHandlerRuleService eventHandlerRuleService,
                         IEventHandlerService eventHandlerService,
@@ -58,15 +61,16 @@ namespace CFEventHandler.API.Controllers
                         IEmailSettingsService emailSettingsService, 
                         IHTTPSettingsService httpSettingsService, 
                         IProcessSettingsService processSettingsService, 
-                        ISecurityAdmin securityAdmin,
+                        ISecurityAdminService securityAdminService,
                         ISignalRSettingsService signalRSettingsService,
                         ISMSSettingsService smsSettingsService, 
                         ISQLSettingsService sqlSettingsService,
-                        ITeamsSettingsService teamsSettingsService)
+                        ITeamsSettingsService teamsSettingsService,
+                        ITenantService tenantService)
         {
             _apiKeyCacheService = apiKeyCacheService;
             _apiKeyService = apiKeyService;
-            _databaseAdmin = databaseAdmin;
+            _databaseAdminService = databaseAdminService;
             _eventClientService = eventClientService;
             _eventHandlerRuleService = eventHandlerRuleService;
             _eventHandlerService = eventHandlerService;
@@ -76,33 +80,40 @@ namespace CFEventHandler.API.Controllers
             _emailSettingsService = emailSettingsService;
             _httpSettingsService = httpSettingsService;
             _processSettingsService = processSettingsService;
-            _securityAdmin = securityAdmin;
+            _securityAdminService = securityAdminService;
             _signalRSettingsService = signalRSettingsService;
             _smsSettingsService = smsSettingsService;
             _sqlSettingsService = sqlSettingsService;
             _teamsSettingsService = teamsSettingsService;
+            _tenantService = tenantService;
         }
-  
+
         /// <summary>
-        /// Creates all data
+        /// Deletes all data and creates shared data and tenant data using data for specific group
         /// </summary>
         /// <returns></returns>
         [HttpPost]
         [Route("CreateData")]
-        public async Task<IActionResult> CreateData()
+        public async Task<IActionResult> CreateData([FromQuery] int group = 1)
         {
-            try
+            if (group < 0 || group < 1)
             {
-                await _databaseAdmin.LoadData(1);
-
-                // Refresh API key cache
-                _securityAdmin.RefreshAPIKeyCache();
-            }
-            catch(Exception exception)
-            {
-                throw;
+                return Problem(title: "Group must be between 1 and 1", statusCode: (int)HttpStatusCode.BadRequest);
             }
 
+            // Delete all data
+            await _databaseAdminService.DeleteAllData();
+
+            // Load shared data
+            await _databaseAdminService.LoadSharedData(group);
+
+            // Load tenant data for tenant #1
+            var tenant = await _tenantService.GetByNameAsync("Tenant 1");
+            await _databaseAdminService.LoadTenantData(tenant.Id, group);
+
+            // Refresh API key cache
+            _securityAdminService.RefreshAPIKeyCache();
+        
             return Ok();
         }
 

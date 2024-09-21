@@ -2,7 +2,7 @@
 
 namespace CFEventHandler.SQL
 {
-    public interface ISQLSettingsService : IEventSettingsService<SQLEventSettings>
+    public interface ISQLSettingsService : IEntityWithIDService<SQLEventSettings, string>
     {
         
     }

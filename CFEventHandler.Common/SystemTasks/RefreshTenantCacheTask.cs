@@ -27,8 +27,8 @@ namespace CFEventHandler.SystemTasks
             {
                 _schedule.Executing = true;
 
-                var tenantAdmin = serviceProvider.GetRequiredService<ITenantAdmin>();
-                tenantAdmin.RefreshTenantCache();
+                var tenantAdminService = serviceProvider.GetRequiredService<ITenantAdminService>();
+                tenantAdminService.RefreshTenantCache();
             }
             finally
             {

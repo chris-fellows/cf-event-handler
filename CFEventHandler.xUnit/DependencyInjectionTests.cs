@@ -15,36 +15,29 @@ namespace CFEventHandler.xUnit
     /// <summary>
     /// Tests for dependency injection
     /// </summary>
-    public class DependencyInjectionTests : IClassFixture<WebApplicationFactory<Program>>    
-    { 
-        private readonly WebApplicationFactory<Program> _factory;
-
-        public DependencyInjectionTests(WebApplicationFactory<Program> factory)
+    public class DependencyInjectionTests : FactoryTestsBase, IClassFixture<WebApplicationFactory<Program>>    
+    {         
+        public DependencyInjectionTests(WebApplicationFactory<Program> factory) : base(factory)
         {
-            // Set local appsettings.json
-            var configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Test.json");
-            _factory = factory.WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureAppConfiguration((context, conf) =>
-                {
-                    conf.AddJsonFile(configPath);
-                });
-            });
+           
         }
         
         [Theory]        
         [InlineData(typeof(IAPIKeyCacheService))]
         [InlineData(typeof(IAPIKeyService))]
-        [InlineData(typeof(IDatabaseAdmin))]
+        [InlineData(typeof(IDatabaseAdminService))]
         [InlineData(typeof(IDatabaseConfig))]
         [InlineData(typeof(IEventClientService))]
+        [InlineData(typeof(IEventHandlerRuleService))]
         [InlineData(typeof(IEventManagerService))]
         [InlineData(typeof(IEventQueueService))]
         [InlineData(typeof(IEventService))]
         [InlineData(typeof(IEventTypeService))]
         [InlineData(typeof(IMapper))]
         [InlineData(typeof(IRequestInfoService))]
-        [InlineData(typeof(ISecurityAdmin))]
+        [InlineData(typeof(ISecurityAdminService))]
+        [InlineData(typeof(ITenantAdminService))]
+        [InlineData(typeof(ITenantDatabaseConfig))]        
         public async Task Get_Registered_Service_Succeeds(Type serviceType)
         {            
             using (var scope = _factory.Services.CreateScope())

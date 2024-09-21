@@ -12,22 +12,14 @@ using System.Threading.Tasks;
 
 namespace CFEventHandler.xUnit
 {
-    public class ControllerTests : IClassFixture<WebApplicationFactory<Program>>
+    public class ControllerTests : FactoryTestsBase, IClassFixture<WebApplicationFactory<Program>>
     {
         //private readonly HttpClient _client;
-        private readonly WebApplicationFactory<Program> _factory;
+        //private readonly WebApplicationFactory<Program> _factory;
 
-        public ControllerTests(WebApplicationFactory<Program> factory)
-        {                        
-            // Set local appsettings.json
-            var configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Test.json");            
-            _factory = factory.WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureAppConfiguration((context, conf) =>
-                {
-                    conf.AddJsonFile(configPath);
-                });
-            });            
+        public ControllerTests(WebApplicationFactory<Program> factory) : base(factory)
+        {   
+
         }     
 
         [Fact]
