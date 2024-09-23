@@ -20,5 +20,12 @@ namespace CFEventHandler.Interfaces
         /// <param name="eventFilter"></param>
         /// <returns></returns>
         Task DeleteByFilter(EventFilter eventFilter);
+
+        /// <summary>
+        /// Gets event summary
+        /// </summary>
+        /// <param name="eventFilter"></param>
+        /// <returns></returns>
+        Task<List<EventSummary>> GetEventSummary(EventFilter eventFilter);
     }
 }

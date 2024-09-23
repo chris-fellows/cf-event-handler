@@ -27,7 +27,7 @@ namespace CFEventHandler.SystemTasks
         {
             try
             {
-                _schedule.Executing = true;
+                _schedule.IsExecuting = true;
 
                 var eventClientService = serviceProvider.GetRequiredService<IEventClientService>();
                 var eventService = serviceProvider.GetRequiredService<IEventService>();
@@ -75,7 +75,7 @@ namespace CFEventHandler.SystemTasks
             }
             finally
             {
-                _schedule.Executing = false;
+                _schedule.IsExecuting = false;
             }
         }
     }

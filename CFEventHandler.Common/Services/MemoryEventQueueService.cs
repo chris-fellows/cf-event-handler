@@ -7,11 +7,11 @@ namespace CFEventHandler.Services
     /// Memory event queue service
     /// </summary>
     public class MemoryEventQueueService : IEventQueueService
-    {
+    {                
         private readonly Queue<EventInstance> _eventInstances = new Queue<EventInstance>();
 
         public void Add(EventInstance eventInstance)
-        {
+        {            
             _eventInstances.Enqueue(eventInstance);
         }
 
@@ -20,7 +20,8 @@ namespace CFEventHandler.Services
         public EventInstance? GetNext()
         {
             if (_eventInstances.Count == 0) return null;
-            return _eventInstances.Dequeue();
+
+            var eventInstance = _eventInstances.Dequeue();
         }
     }
 }

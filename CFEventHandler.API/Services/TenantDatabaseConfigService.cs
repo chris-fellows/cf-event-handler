@@ -16,7 +16,7 @@ namespace CFEventHandler.API.Services
         public ITenantDatabaseConfig GetCurrent()
         {
             var currentTenantContext = _serviceProvider.GetRequiredService<ICurrentTenantContext>();            
-            var apiKeyInstance = _serviceProvider.GetRequiredService<IRequestInfoService>().APIKeyInstance;            
+            var apiKeyInstance = _serviceProvider.GetRequiredService<IRequestInfoService>().ValidAPIKeyInstance;            
 
             Tenant tenant = null;
             if (currentTenantContext.TenantDatabaseConfig != null &&

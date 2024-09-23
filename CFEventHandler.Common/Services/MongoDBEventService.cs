@@ -4,6 +4,7 @@ using CFEventHandler.Models;
 using CFUtilities.Utilities;
 using MongoDB.Driver;
 using System;
+using System.Linq.Expressions;
 
 namespace CFEventHandler.Services
 {
@@ -90,6 +91,44 @@ namespace CFEventHandler.Services
 
             // Delete
             await _entities.DeleteManyAsync(filterDefinition);            
+        }
+
+        public async Task<List<EventSummary>> GetEventSummary(EventFilter eventFilter)
+        {
+            var filterDefinition = GetFilterDefinition(eventFilter);
+
+            //// Defines the aggregation pipeline with the $match and $group aggregation stages
+            //var pipeline = new EmptyPipelineDefinition<EventInstance>()
+            //    .Match(filterDefinition)
+            //    .Group(r => new { Date = r.CreatedDateTime.Date, EventClientId = r.EventClientId, EventTypeId = r.EventTypeId },
+            //        g => new
+            //        {
+            //            Date = g.Key.Date,
+            //            EventClientId = g.Key.EventClientId,
+            //            EventTypeId = g.Key.EventTypeId,
+            //            Count = g.Count()
+            //        }
+            //    );
+
+            // Defines the aggregation pipeline with the $match and $group aggregation stages
+            var pipeline = new EmptyPipelineDefinition<EventInstance>()
+                .Match(filterDefinition)
+                .Group(r => r.CreatedDateTime,
+                    g => new
+                    {
+                        Date = g.Key.Date,
+                        EventClientId = "X",
+                        EventTypeId = "Y",
+                        Count = g.Count()
+                    }
+                );
+
+            // Executes the aggregation pipeline
+            var results = (await _entities.AggregateAsync(pipeline)).ToListAsync().Result;
+
+            var eventSummaries = results.Select(r => new EventSummary() { Date = r.Date, EventClientId = r.EventClientId, EventTypeId  = r.EventTypeId, Count = r.Count }).ToList();
+            
+            return eventSummaries;
         }
     }
 }

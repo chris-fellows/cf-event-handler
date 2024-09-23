@@ -5,6 +5,7 @@ using CFEventHandler.API.Hubs;
 using CFEventHandler.API.Interfaces;
 using CFEventHandler.API.Security;
 using CFEventHandler.API.Services;
+using CFEventHandler.API.Utilities;
 using CFEventHandler.Common.Services;
 using CFEventHandler.Console;
 using CFEventHandler.CSV;
@@ -34,6 +35,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("CFEventHandler.xUnit")]     // Allows test project to see this
 //var isTestsRunning = ConfigUtilities.IsTestsRunning;
 
+// Set data location. For testing then we might want to set this to in-memory data
 DataLocationTypes dataLocationType = DataLocationTypes.MongoDB;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -168,7 +170,7 @@ builder.Services.AddScoped<IRequestInfoService, RequestInfoService>();
 // Set event queue
 builder.Services.AddSingleton<IEventQueueService, MemoryEventQueueService>();
 
-// Set system tasks list
+// Set system tasks list.
 builder.Services.AddSingleton<ISystemTasks>((scope) =>
 {
     var systemTasks = new List<ISystemTask>()
@@ -176,34 +178,37 @@ builder.Services.AddSingleton<ISystemTasks>((scope) =>
         /*
         new DeleteOldEventsTask(new SystemTaskSchedule() 
             { 
-                ExecuteFrequency = TimeSpan.FromHours(12), 
-                LastExecuteTime = DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow)
+                ExecuteFrequency = TimeSpan.FromHours(12)                
             })
         */
         /*
         new RandomEventsTask(new SystemTaskSchedule()
             {
-                ExecuteFrequency = TimeSpan.FromSeconds(30),
-                LastExecuteTime = DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow)
+                ExecuteFrequency = TimeSpan.FromSeconds(30)                
             })
         */
          new SaveStatisticsTask(new SystemTaskSchedule()
             {
-                ExecuteFrequency = TimeSpan.FromMinutes(15),
-                LastExecuteTime = DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow)
+                ExecuteFrequency = TimeSpan.FromMinutes(15)                
          }),
          new RefreshAPIKeyCacheTask(new SystemTaskSchedule()
          {
-                ExecuteFrequency = TimeSpan.FromMinutes(60),
-                LastExecuteTime = DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow)
+                ExecuteFrequency = TimeSpan.FromMinutes(60)                
          }),
          new RefreshTenantCacheTask(new SystemTaskSchedule()
          {
-                ExecuteFrequency = TimeSpan.FromMinutes(60),
-                LastExecuteTime = DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow)
+                ExecuteFrequency = TimeSpan.FromMinutes(60)                
          }),
     };
-    systemTasks.RemoveAll(st => st == null);
+    systemTasks.RemoveAll(st => st == null);   // Allow configurable list of tasks (E.g. Not used in test mode)
+
+    // Set next execute time
+    systemTasks.ForEach(st => st.Schedule.NextExecuteTime = 
+        st.Schedule.CalculateNextFutureExecuteTime(DateTimeUtilities.GetStartOfDay(DateTimeOffset.UtcNow), DateTimeOffset.UtcNow));
+
+    // Set last execute time
+    systemTasks.ForEach(st => st.Schedule.LastExecuteTime = 
+        st.Schedule.NextExecuteTime.Subtract(st.Schedule.ExecuteFrequency));
     return new SystemTasks(systemTasks, 5);
 });
 
@@ -254,10 +259,11 @@ using (var scope = app.Services.CreateScope())
     var validationResult = item.Validate(eventTypeDTO);
     int xxx = 1000;
     */
-
+    
     // Initialise shared DB
-    var databaseAdminService = scope.ServiceProvider.GetRequiredService<IDatabaseAdminService>();       
+    var databaseAdminService = scope.ServiceProvider.GetRequiredService<IDatabaseAdminService>();               
     await databaseAdminService.InitialiseSharedAsync();
+    //await databaseAdminService.LoadSharedData(1);
 
     // Initialise tenant DBs
     var tenantService = scope.ServiceProvider.GetService<ITenantService>();
@@ -265,6 +271,7 @@ using (var scope = app.Services.CreateScope())
     foreach(var tenant in tenants)
     {
         await databaseAdminService.InitialiseTenantAsync(tenant.Id);
+        //await databaseAdminService.LoadTenantData(tenant.Id, 1);
     }
     
     // Execute system tasks that must execute before HTTP pipeline runs

@@ -173,5 +173,26 @@ namespace CFEventHandler.API.Controllers
 
             return Ok();
         }
+
+        /// <summary>
+        /// Tests unhandled error (Should get caught by ErrorMiddlewareService)
+        /// </summary>        
+        /// <returns></returns>        
+        [HttpGet]
+        [Route("GetEvents")]
+        public async Task<IActionResult> GetEventSummary()
+        {
+            var eventFilter = new EventFilter()
+            {
+                FromCreatedDateTime = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(-90)),
+                ToCreatedDateTime = DateTimeOffset.UtcNow.AddDays(1),
+                PageItems = 10000000,
+                PageNo = 1
+            };
+
+            var eventSummaries = await _eventService.GetEventSummary(eventFilter);
+
+            return Ok(eventSummaries);
+        }
     }
 }

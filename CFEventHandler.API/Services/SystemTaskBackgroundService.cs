@@ -5,7 +5,7 @@ namespace CFEventHandler.API.Services
     /// <summary>
     /// Background service for executing system tasks.
     /// 
-    /// The following types of system task are executed:
+    /// System tasks can be executed in one of the following ways:
     /// - During API startup. E.g. Tasks that need to execute before HTTP pipeline is processed.
     /// - Scheduled intervals. E.g. Every 60 mins.
     /// - Requested on demand. E.g. Refresh API key cache after new API key added.
@@ -30,13 +30,11 @@ namespace CFEventHandler.API.Services
         }
 
         /// <summary>
-        /// Handles completed tasks
-        /// 
-        /// TODO: Implement logging
+        /// Handles completed tasks        
         /// </summary>
         /// <param name="taskInfos"></param>
         /// <returns></returns>
-        private async Task HandleCompletedTasks(List<TaskInfo> taskInfos)
+        private static void HandleCompletedTasks(List<TaskInfo> taskInfos)
         {
             var completedTasks = taskInfos.Where(ti => ti.Task.IsCompleted).ToList();
 
@@ -44,6 +42,15 @@ namespace CFEventHandler.API.Services
             {
                 var completedTask = completedTasks.First();
                 completedTasks.Remove(completedTask);
+                taskInfos.Remove(completedTask);
+                if (completedTask.Task.Exception != null)   // Error
+                {
+                    System.Diagnostics.Debug.WriteLine($"System task {completedTask.SystemTask.Name} error: {completedTask.Task.Exception.Message}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"System task {completedTask.SystemTask.Name} completed");
+                }                
             }
         }
 
@@ -64,7 +71,7 @@ namespace CFEventHandler.API.Services
                 // Wait if too many active tasks
                 while (activeTaskInfos.Count >= _systemTasks.MaxConcurrentTasks)
                 {
-                    await HandleCompletedTasks(activeTaskInfos);
+                    HandleCompletedTasks(activeTaskInfos);
                     await Task.Delay(500);
                 }
 
@@ -76,13 +83,13 @@ namespace CFEventHandler.API.Services
                 };
                 activeTaskInfos.Add(taskInfo);
 
-                await HandleCompletedTasks(activeTaskInfos);
+                HandleCompletedTasks(activeTaskInfos);
             }
 
             // Wait for tasks to complete
             while (activeTaskInfos.Any())
             {                
-                await HandleCompletedTasks(activeTaskInfos);
+                HandleCompletedTasks(activeTaskInfos);
                 await Task.Delay(500);
             }
         }
@@ -93,7 +100,7 @@ namespace CFEventHandler.API.Services
         /// <param name="activeTaskInfos"></param>
         /// <param name="stoppingToken"></param>
         /// <returns></returns>
-        private async Task ExecuteScheduledTasks(List<TaskInfo> activeTaskInfos, CancellationToken stoppingToken)
+        private void ExecuteScheduledTasks(List<TaskInfo> activeTaskInfos, CancellationToken stoppingToken)
         {
             if (!stoppingToken.IsCancellationRequested &&
                 activeTaskInfos.Count < _systemTasks.MaxConcurrentTasks)
@@ -125,7 +132,7 @@ namespace CFEventHandler.API.Services
         /// Executes overdue requested tasks
         /// </summary>
         /// <returns></returns>
-        private async Task ExecuteRequestedTasks(List<TaskInfo> activeTaskInfos, CancellationToken stoppingToken)
+        private void ExecuteRequestedTasks(List<TaskInfo> activeTaskInfos, CancellationToken stoppingToken)
         {
             if (!stoppingToken.IsCancellationRequested &&
                 activeTaskInfos.Count < _systemTasks.MaxConcurrentTasks)
@@ -163,13 +170,13 @@ namespace CFEventHandler.API.Services
                     activeTaskInfos.Any())
             {
                 // Check completed tasks
-                await HandleCompletedTasks(activeTaskInfos);
+                HandleCompletedTasks(activeTaskInfos);
               
                 // Execute scheduled tasks                
-                await ExecuteScheduledTasks(activeTaskInfos, stoppingToken);                
+                ExecuteScheduledTasks(activeTaskInfos, stoppingToken);                
 
                 // Execute requested tasks                
-                await ExecuteRequestedTasks(activeTaskInfos, stoppingToken);                
+                ExecuteRequestedTasks(activeTaskInfos, stoppingToken);                
 
                 // Wait before next loop
                 await Task.Delay(activeTaskInfos.Any() ||
@@ -192,8 +199,16 @@ namespace CFEventHandler.API.Services
                 // Set last execute time to scheduled time
                 systemTask.Schedule.LastExecuteTime = systemTask.Schedule.NextExecuteTime;
 
-                // Execute task
-                systemTask.ExecuteAsync(cancellationToken, _serviceProvider, parameters).Wait();
+                // Set next execute time based on last execute time
+                systemTask.Schedule.NextExecuteTime = systemTask.Schedule.CalculateNextFutureExecuteTime(systemTask.Schedule.LastExecuteTime, systemTask.Schedule.LastExecuteTime);
+
+                System.Diagnostics.Debug.WriteLine($"{DateTimeOffset.UtcNow.ToString()} : Executing system task {systemTask.Name} (Execute Time={systemTask.Schedule.LastExecuteTime}, Next Execute Time={systemTask.Schedule.NextExecuteTime}");
+
+                // Create task scope
+                using (var scope = _serviceProvider.CreateScope())
+                {                    
+                    systemTask.ExecuteAsync(cancellationToken, scope.ServiceProvider, parameters).Wait();
+                }
             });
         }
     }

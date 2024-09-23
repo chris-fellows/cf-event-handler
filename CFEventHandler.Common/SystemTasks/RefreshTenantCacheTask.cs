@@ -1,4 +1,5 @@
 ﻿using CFEventHandler.Interfaces;
+using CFEventHandler.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CFEventHandler.SystemTasks
@@ -25,14 +26,14 @@ namespace CFEventHandler.SystemTasks
         {
             try
             {
-                _schedule.Executing = true;
+                _schedule.IsExecuting = true;
 
-                var tenantAdminService = serviceProvider.GetRequiredService<ITenantAdminService>();
+                var tenantAdminService = serviceProvider.GetRequiredService<ITenantAdminService>();                
                 tenantAdminService.RefreshTenantCache();
             }
             finally
             {
-                _schedule.Executing = false;
+                _schedule.IsExecuting = false;
             }
         }
     }

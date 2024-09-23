@@ -24,3 +24,9 @@ System Tasks
 ------------
 - System tasks run in the background.
 - They can be executed at scheduled intervals or on demand (E.g. When data changes)
+
+Future Changes
+--------------
+- Consider changing middleway to set ICurrentTenantContext for HTTP requests. Currently we only set it for code
+  outside of the pipeline where we need to DI resolve a service for a specific tenant.
+- Fix background event handler to read TenantId and set ICurrentTenantContext.

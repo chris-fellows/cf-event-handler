@@ -1,4 +1,6 @@
-﻿namespace CFEventHandler.SystemTasks
+﻿using MongoDB.Driver;
+
+namespace CFEventHandler.SystemTasks
 {
     public class SystemTaskSchedule
     {
@@ -8,23 +10,38 @@
         public TimeSpan ExecuteFrequency { get; set; }
 
         /// <summary>
-        /// Last execute time
+        /// Last execute time. This is the time that it was scheduled to execute, not the actual time. The actual
+        /// time may be seconds after the scheduled time.
         /// </summary>
         public DateTimeOffset LastExecuteTime { get; set; }
-
+        
         /// <summary>
         /// Next execute time
         /// </summary>
-        public DateTimeOffset NextExecuteTime
+        public DateTimeOffset NextExecuteTime { get; set; }
+
+        /// <summary>
+        /// Calculates the next future time to execute the task
+        /// </summary>
+        /// <param name="lastExecuteTime"></param>
+        /// <param name="currentTime"></param>
+        /// <returns></returns>
+        public DateTimeOffset CalculateNextFutureExecuteTime(DateTimeOffset lastExecuteTime, DateTimeOffset currentTime)
         {
-            get { return ExecuteFrequency == TimeSpan.Zero ?
-                    DateTimeOffset.MaxValue :
-                    LastExecuteTime.Add(ExecuteFrequency); }
+            if (ExecuteFrequency == TimeSpan.Zero) return DateTimeOffset.MaxValue;
+
+            // Ensure that next time is in the future
+            DateTimeOffset next = lastExecuteTime;            
+            while (next <= currentTime)
+            {
+                next = next.Add(ExecuteFrequency);
+            }
+            return next;
         }
 
         /// <summary>
         /// Whether task is executing
         /// </summary>
-        public bool Executing { get; set; }
+        public bool IsExecuting { get; set; }
     }
 }

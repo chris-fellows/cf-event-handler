@@ -1,4 +1,6 @@
-﻿namespace CFEventHandler.SystemTasks
+﻿using CFUtilities.Utilities;
+
+namespace CFEventHandler.SystemTasks
 {
     public class SystemTasks : ISystemTasks
     {
@@ -18,7 +20,7 @@
 
         public List<ISystemTask> ActiveTasks
         {
-            get { return _systemTasks.Where(st => st.Schedule.Executing).ToList(); }
+            get { return _systemTasks.Where(st => st.Schedule.IsExecuting).ToList(); }
         }
 
         public List<ISystemTask> OverdueTasks  

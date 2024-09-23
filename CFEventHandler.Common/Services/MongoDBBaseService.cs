@@ -9,15 +9,36 @@ namespace CFEventHandler.Services
     /// </summary>
     /// <typeparam name="TEntityType"></typeparam>
     public abstract class MongoDBBaseService<TEntityType>
-    {
-        protected MongoClient? _client;
-        protected IMongoCollection<TEntityType> _entities;
+    {        
+        //protected MongoClient? _client;
+        //protected IMongoCollection<TEntityType> _entities;
+        protected readonly Lazy<Tuple<MongoClient, IMongoCollection<TEntityType>>>? _lazy;
+
+        protected MongoClient _client => _lazy!.Value.Item1;
+        protected IMongoCollection<TEntityType> _entities => _lazy!.Value.Item2;
 
         public MongoDBBaseService(IDatabaseConfig databaseConfig, string collectionName)
         {
-            _client = new MongoClient(databaseConfig.ConnectionString);
-            var database = _client.GetDatabase(databaseConfig.DatabaseName);
-            _entities = database.GetCollection<TEntityType>(collectionName);
+            // Set properties to initialise on first use
+            _lazy = new Lazy<Tuple<MongoClient, IMongoCollection<TEntityType>>>(() => Initialise(databaseConfig, collectionName));
+
+            //_client = new MongoClient(databaseConfig.ConnectionString);
+            //var database = _client.GetDatabase(databaseConfig.DatabaseName);
+            //_entities = database.GetCollection<TEntityType>(collectionName);
+        }
+
+        /// <summary>
+        /// Initialises Mongo properties
+        /// </summary>
+        /// <param name="databaseConfig"></param>
+        /// <param name="collectionName"></param>
+        /// <returns></returns>
+        protected Tuple<MongoClient, IMongoCollection<TEntityType>> Initialise(IDatabaseConfig databaseConfig, string collectionName)
+        {            
+            var client = new MongoClient(databaseConfig.ConnectionString);
+            var database = client.GetDatabase(databaseConfig.DatabaseName);
+            var collection = database.GetCollection<TEntityType>(collectionName);
+            return new Tuple<MongoClient, IMongoCollection<TEntityType>>(client, collection);
         }
 
         public async Task ImportAsync(IEntityList<TEntityType> entityList)

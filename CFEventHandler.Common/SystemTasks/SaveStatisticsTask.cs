@@ -32,13 +32,13 @@ namespace CFEventHandler.SystemTasks
         {
             try
             {
-                _schedule.Executing = true;
+                _schedule.IsExecuting = true;
                 
                 // TODO: Implement this                            
             }
             finally
             {
-                _schedule.Executing = false;
+                _schedule.IsExecuting = false;
             }
         }
     }
