@@ -3,7 +3,7 @@ using CFEventHandler.Models;
 
 namespace CFEventHandler.Seed
 {
-    public class DocumentTemplateSeed1 : IEntityList<DocumentTemplate>
+    public class DocumentTemplateSeed1 : IEntityReader<DocumentTemplate>
     {
         public async Task<List<DocumentTemplate>> ReadAllAsync()
         {
@@ -40,11 +40,6 @@ namespace CFEventHandler.Seed
             });
 
             return documentTemplates;
-        }
-
-        public async Task WriteAllAsync(List<DocumentTemplate> documentTemplates)
-        {
-            // No action
         }
     }
 }

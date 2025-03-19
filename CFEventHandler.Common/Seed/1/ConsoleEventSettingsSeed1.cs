@@ -3,7 +3,7 @@ using CFEventHandler.Interfaces;
 
 namespace CFEventHandler.Seed
 {
-    public class ConsoleEventSettingsSeed1 : IEntityList<ConsoleEventSettings>
+    public class ConsoleEventSettingsSeed1 : IEntityReader<ConsoleEventSettings>
     {
         public async Task<List<ConsoleEventSettings>> ReadAllAsync()
         {
@@ -16,11 +16,6 @@ namespace CFEventHandler.Seed
             });
 
             return settings;
-        }
-
-        public async Task WriteAllAsync(List<ConsoleEventSettings> settingsList)
-        {
-            // No action
         }
     }
 }

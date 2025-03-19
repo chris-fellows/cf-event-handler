@@ -130,7 +130,7 @@ namespace CFEventHandler.API.Controllers
             var item2 = _eventTypeService.GetAll().ToList();
 
             var eventTypeSeed = new EventTypeSeed1();
-            await _eventTypeService.ExportAsync(eventTypeSeed);
+            await _eventTypeService.ImportAsync(eventTypeSeed);
 
             return Ok();
         }

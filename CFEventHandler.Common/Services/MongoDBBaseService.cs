@@ -41,14 +41,14 @@ namespace CFEventHandler.Services
             return new Tuple<MongoClient, IMongoCollection<TEntityType>>(client, collection);
         }
 
-        public async Task ImportAsync(IEntityList<TEntityType> entityList)
+        public async Task ImportAsync(IEntityReader<TEntityType> entityReader)
         {
             using (var session = await _client.StartSessionAsync())
             {
                 try
                 {
                     session.StartTransaction();
-                    await _entities.InsertManyAsync(entityList.ReadAllAsync().Result);
+                    await _entities.InsertManyAsync(entityReader.ReadAllAsync().Result);
                     await session.CommitTransactionAsync();
                 }
                 catch(Exception exception)
@@ -59,10 +59,9 @@ namespace CFEventHandler.Services
             }
         }
 
-        public Task ExportAsync(IEntityList<TEntityType> eventTypeList)
+        public async Task ExportAsync(IEntityWriter<TEntityType> entityWriter)
         {
-            eventTypeList.WriteAllAsync(GetAll().ToList());
-            return Task.CompletedTask;
+            await entityWriter.WriteAllAsync(GetAll().ToList());            
         }
 
         public IEnumerable<TEntityType> GetAll()
@@ -83,6 +82,12 @@ namespace CFEventHandler.Services
         public Task<TEntityType> AddAsync(TEntityType eventType)
         {
             _entities.InsertOneAsync(eventType);
+            return Task.FromResult(eventType);
+        }
+
+        public Task<TEntityType> UpdateAsync(TEntityType eventType)
+        {            
+            //_entities.UpdateOneAsync(eventType);
             return Task.FromResult(eventType);
         }
 

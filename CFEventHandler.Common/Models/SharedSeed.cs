@@ -4,6 +4,6 @@ namespace CFEventHandler.Models
 {
     public class SharedSeed
     {
-        public IEntityList<Tenant> Tenants { get; set; }
+        public IEntityReader<Tenant> Tenants { get; set; }
     }
 }

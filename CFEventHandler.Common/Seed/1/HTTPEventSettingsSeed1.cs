@@ -3,7 +3,7 @@ using CFEventHandler.Interfaces;
 
 namespace CFEventHandler.Seed
 {
-    public class HTTPEventSettingsSeed1 : IEntityList<HTTPEventSettings>
+    public class HTTPEventSettingsSeed1 : IEntityReader<HTTPEventSettings>
     {
         public async Task<List<HTTPEventSettings>> ReadAllAsync()
         {
@@ -19,11 +19,6 @@ namespace CFEventHandler.Seed
             });
             
             return settings;
-        }
-
-        public async Task WriteAllAsync(List<HTTPEventSettings> settingsList)
-        {
-            // No action
         }
     }
 }

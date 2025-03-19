@@ -13,7 +13,7 @@ using CFEventHandler.Teams;
 
 namespace CFEventHandler.Seed
 {
-    public class EventHandlerRuleSeed1 : IEntityList<EventHandlerRule>
+    public class EventHandlerRuleSeed1 : IEntityReader<EventHandlerRule>
     {
         private readonly IConsoleSettingsService _consoleSettingsService;
         private readonly ICSVSettingsService _csvSettingsService;
@@ -130,11 +130,6 @@ namespace CFEventHandler.Seed
             }
 
             return eventHandlerRules;
-        }
-
-        public async Task WriteAllAsync(List<EventHandlerRule> eventHandlerRules)
-        {
-            // No action
         }
     }
 }

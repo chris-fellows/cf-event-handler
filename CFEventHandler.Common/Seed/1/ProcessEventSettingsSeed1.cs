@@ -3,7 +3,7 @@ using CFEventHandler.Process;
 
 namespace CFEventHandler.Seed
 {
-    public class ProcessEventSettingsSeed1 : IEntityList<ProcessEventSettings>
+    public class ProcessEventSettingsSeed1 : IEntityReader<ProcessEventSettings>
     {
         public async Task<List<ProcessEventSettings>> ReadAllAsync()
         {
@@ -17,11 +17,6 @@ namespace CFEventHandler.Seed
             });
 
             return settings;
-        }
-
-        public async Task WriteAllAsync(List<ProcessEventSettings> settingsList)
-        {
-            // No action
         }
     }
 }

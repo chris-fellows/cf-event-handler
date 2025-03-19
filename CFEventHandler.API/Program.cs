@@ -6,6 +6,7 @@ using CFEventHandler.API.Interfaces;
 using CFEventHandler.API.Security;
 using CFEventHandler.API.Services;
 using CFEventHandler.API.Utilities;
+using CFEventHandler.Common.Seed;
 using CFEventHandler.Common.Services;
 using CFEventHandler.Console;
 using CFEventHandler.CSV;
@@ -16,6 +17,7 @@ using CFEventHandler.Interfaces;
 using CFEventHandler.Models;
 using CFEventHandler.Models.DTO;
 using CFEventHandler.Process;
+using CFEventHandler.Seed;
 using CFEventHandler.Services;
 using CFEventHandler.SignalR;
 using CFEventHandler.SMS;
@@ -88,8 +90,9 @@ builder.Services.AddAuthorization();    // CMF Added (For API key)
 
 // Set health checks
 builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseConnectionHealthCheck>("Database Connection")
     .AddCheck<DataHealthCheck>("Data");
-
+    
 // Add fluent validation 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
@@ -121,8 +124,26 @@ builder.Services.AddScoped<IDatabaseAdminService, DatabaseAdminService>();
 // Tenant admin
 builder.Services.AddScoped<ITenantAdminService, TenantAdminService>();
 
+// Add seed data (Group 1)
+// Format of key must be same except for group number at end
+builder.Services.AddKeyedScoped<IEntityReader<APIKeyInstance>, APIKeySeed1>("APIKeySeed1");
+builder.Services.AddKeyedScoped<IEntityReader<ConsoleEventSettings>, ConsoleEventSettingsSeed1>("ConsoleEventSettingsSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<CSVEventSettings>, CSVEventSettingsSeed1>("CSVEventSettingsSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<DocumentTemplate>, DocumentTemplateSeed1>("DocumentTemplateSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<EmailEventSettings>, EmailEventSettingsSeed1>("EmailEventSettingsSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<EventClient>, EventClientSeed1>("EventClientSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<EventHandlerRule>, EventHandlerRuleSeed1>("EventHandlerRuleSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<EventType>, EventTypeSeed1>("EventTypeSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<HTTPEventSettings>, HTTPEventSettingsSeed1>("HTTPEventSettingsSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<ProcessEventSettings>, ProcessEventSettingsSeed1>("ProcessEventSettingsSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<SignalREventSettings>, SignalREventSettingsSeed1>("SignalREventSettingsSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<SMSEventSettings>, SMSEventSettingsSeed1>("SMSEventSettingsSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<SQLEventSettings>, SQLEventSettingsSeed1>("SQLEventSettingsSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<TeamsEventSettings>, TeamsEventSettingsSeed1>("TeamsEventSettingsSeed1");
+builder.Services.AddKeyedScoped<IEntityReader<Tenant>, TenantSeed1>("TenantSeed1");
+
 // Set data location specific services. For testing then we might want to use in memory data services.
-switch(dataLocationType)
+switch (dataLocationType)
 {
     case DataLocationTypes.MongoDB:
         // Set DB initializer

@@ -3,7 +3,7 @@ using CFEventHandler.Teams;
 
 namespace CFEventHandler.Seed
 {
-    public class TeamsEventSettingsSeed1 : IEntityList<TeamsEventSettings>
+    public class TeamsEventSettingsSeed1 : IEntityReader<TeamsEventSettings>
     {
         public async Task<List<TeamsEventSettings>> ReadAllAsync()
         {
@@ -17,11 +17,6 @@ namespace CFEventHandler.Seed
             });
 
             return settings;
-        }
-
-        public async Task WriteAllAsync(List<TeamsEventSettings> settingsList)
-        {
-            // No action
         }
     }
 }

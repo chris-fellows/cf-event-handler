@@ -3,7 +3,7 @@ using CFEventHandler.Interfaces;
 
 namespace CFEventHandler.Seed
 {
-    public class CSVEventSettingsSeed1 : IEntityList<CSVEventSettings>
+    public class CSVEventSettingsSeed1 : IEntityReader<CSVEventSettings>
     {
         public async Task<List<CSVEventSettings>> ReadAllAsync()
         {
@@ -16,11 +16,6 @@ namespace CFEventHandler.Seed
             });
 
             return settings;
-        }
-
-        public async Task WriteAllAsync(List<CSVEventSettings> settingsList)
-        {
-            // No action
         }
     }
 }

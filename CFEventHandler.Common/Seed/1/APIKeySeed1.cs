@@ -3,7 +3,7 @@ using CFEventHandler.Models;
 
 namespace CFEventHandler.Common.Seed
 {
-    public class APIKeySeed1 : IEntityList<APIKeyInstance>
+    public class APIKeySeed1 : IEntityReader<APIKeyInstance>
     {
         private readonly ITenantService _tenantService;
 
@@ -60,11 +60,6 @@ namespace CFEventHandler.Common.Seed
             });
 
             return apiKeys;
-        }
-
-        public async Task WriteAllAsync(List<APIKeyInstance> apiKeys)
-        {
-            // No action            
         }
     }
 }

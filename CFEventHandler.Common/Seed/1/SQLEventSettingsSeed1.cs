@@ -3,7 +3,7 @@ using CFEventHandler.SQL;
 
 namespace CFEventHandler.Seed
 {
-    public class SQLEventSettingsSeed1 : IEntityList<SQLEventSettings>
+    public class SQLEventSettingsSeed1 : IEntityReader<SQLEventSettings>
     {
         public async Task<List<SQLEventSettings>> ReadAllAsync()
         {
@@ -17,11 +17,6 @@ namespace CFEventHandler.Seed
             });
 
             return settings;
-        }
-
-        public async Task WriteAllAsync(List<SQLEventSettings> settingsList)
-        {
-            // No action
         }
     }
 }

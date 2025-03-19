@@ -3,7 +3,7 @@ using CFEventHandler.Models;
 
 namespace CFEventHandler.Seed
 {
-    public class TenantSeed1 : IEntityList<Tenant>
+    public class TenantSeed1 : IEntityReader<Tenant>
     {
         public async Task<List<Tenant>> ReadAllAsync()
         {
@@ -24,11 +24,6 @@ namespace CFEventHandler.Seed
             });
 
             return tenants;
-        }
-
-        public async Task WriteAllAsync(List<Tenant> tenantList)
-        {
-            // No action            
         }
     }
 }

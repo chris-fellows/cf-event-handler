@@ -3,7 +3,7 @@ using CFEventHandler.SMS;
 
 namespace CFEventHandler.Seed
 {
-    public class SMSEventSettingsSeed1 : IEntityList<SMSEventSettings>
+    public class SMSEventSettingsSeed1 : IEntityReader<SMSEventSettings>
     {
         public async Task<List<SMSEventSettings>> ReadAllAsync()
         {
@@ -16,11 +16,6 @@ namespace CFEventHandler.Seed
             });
 
             return settings;
-        }
-
-        public async Task WriteAllAsync(List<SMSEventSettings> settingsList)
-        {
-            // No action
         }
     }
 }

@@ -86,6 +86,7 @@ namespace CFEventHandler.Services
                      documentTemplateService, emailSettingsService,
                      eventHandlerService, eventTypeService,
                      httpSettingsService, processSettingsService,
+                     tenantScope.ServiceProvider,
                      signalRSettingsService, smsSettingsService,
                      sqlSettingsService, teamsSettingsService, tenantService);
 

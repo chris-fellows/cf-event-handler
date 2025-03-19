@@ -3,7 +3,7 @@ using CFEventHandler.Models;
 
 namespace CFEventHandler.Seed
 {
-    public class EventClientSeed1 : IEntityList<EventClient>
+    public class EventClientSeed1 : IEntityReader<EventClient>
     {
         public async Task<List<EventClient>> ReadAllAsync()
         {
@@ -22,11 +22,6 @@ namespace CFEventHandler.Seed
             });
 
             return eventClients;
-        }
-
-        public async Task WriteAllAsync(List<EventClient> eventClients)
-        {
-            // No action
         }
     }
 }

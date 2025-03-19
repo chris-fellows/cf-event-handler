@@ -3,7 +3,7 @@ using CFEventHandler.Interfaces;
 
 namespace CFEventHandler.Seed
 {
-    public class EmailEventSettingsSeed1 : IEntityList<EmailEventSettings>
+    public class EmailEventSettingsSeed1 : IEntityReader<EmailEventSettings>
     {
         private readonly IDocumentTemplateService _documentTemplateService;
 
@@ -52,11 +52,6 @@ namespace CFEventHandler.Seed
             });
 
             return settings;
-        }
-
-        public async Task WriteAllAsync(List<EmailEventSettings> settingsList)
-        {
-            // No action
         }
     }
 }

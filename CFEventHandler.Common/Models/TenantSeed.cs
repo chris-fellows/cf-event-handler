@@ -17,33 +17,33 @@ namespace CFEventHandler.Models
     /// </summary>
     public class TenantSeed
     {
-        public IEntityList<APIKeyInstance> APIKeys { get; set; }
-        public IEntityList<DocumentTemplate> DocumentTemplates { get; set; }
+        public IEntityReader<APIKeyInstance> APIKeys { get; set; }
+        public IEntityReader<DocumentTemplate> DocumentTemplates { get; set; }
 
-        public IEntityList<EventClient> EventClients { get; set; }
+        public IEntityReader<EventClient> EventClients { get; set; }
 
-        public IEntityList<CFEventHanderObject> EventHandlers { get; set; }
+        public IEntityReader<CFEventHanderObject> EventHandlers { get; set; }
 
-        public IEntityList<EventHandlerRule> EventHandlerRules { get; set; }
+        public IEntityReader<EventHandlerRule> EventHandlerRules { get; set; }
 
-        public IEntityList<EventType> EventTypes { get; set; }    
+        public IEntityReader<EventType> EventTypes { get; set; }    
         
-        public IEntityList<ConsoleEventSettings> ConsoleEventSettings { get; set; }
+        public IEntityReader<ConsoleEventSettings> ConsoleEventSettings { get; set; }
 
-        public IEntityList<CSVEventSettings> CSVEventSettings { get; set; }
+        public IEntityReader<CSVEventSettings> CSVEventSettings { get; set; }
 
-        public IEntityList<EmailEventSettings> EmailEventSettings { get; set; }
+        public IEntityReader<EmailEventSettings> EmailEventSettings { get; set; }
 
-        public IEntityList<HTTPEventSettings> HTTPEventSettings { get; set; }
+        public IEntityReader<HTTPEventSettings> HTTPEventSettings { get; set; }
 
-        public IEntityList<ProcessEventSettings> ProcessEventSettings { get; set; }
+        public IEntityReader<ProcessEventSettings> ProcessEventSettings { get; set; }
 
-        public IEntityList<SignalREventSettings> SignalREventSettings { get; set; }
+        public IEntityReader<SignalREventSettings> SignalREventSettings { get; set; }
 
-        public IEntityList<SMSEventSettings> SMSEventSettings { get; set; }
+        public IEntityReader<SMSEventSettings> SMSEventSettings { get; set; }
 
-        public IEntityList<SQLEventSettings> SQLEventSettings { get; set; }
+        public IEntityReader<SQLEventSettings> SQLEventSettings { get; set; }
 
-        public IEntityList<TeamsEventSettings> TeamsEventSettings { get; set; }
+        public IEntityReader<TeamsEventSettings> TeamsEventSettings { get; set; }
     }
 }

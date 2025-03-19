@@ -22,6 +22,7 @@ namespace CFEventHandler.Services
             if (_eventInstances.Count == 0) return null;
 
             var eventInstance = _eventInstances.Dequeue();
+            return eventInstance;
         }
     }
 }

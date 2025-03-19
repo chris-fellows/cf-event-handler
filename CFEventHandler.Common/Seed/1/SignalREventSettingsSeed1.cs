@@ -3,7 +3,7 @@ using CFEventHandler.SignalR;
 
 namespace CFEventHandler.Seed
 {
-    public class SignalREventSettingsSeed1 : IEntityList<SignalREventSettings>
+    public class SignalREventSettingsSeed1 : IEntityReader<SignalREventSettings>
     {
         public async Task<List<SignalREventSettings>> ReadAllAsync()
         {
@@ -16,11 +16,6 @@ namespace CFEventHandler.Seed
             });
 
             return settings;
-        }
-
-        public async Task WriteAllAsync(List<SignalREventSettings> settingsList)
-        {
-            // No action
         }
     }
 }

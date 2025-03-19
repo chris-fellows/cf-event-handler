@@ -11,6 +11,7 @@ using CFEventHandler.SignalR;
 using CFEventHandler.SMS;
 using CFEventHandler.SQL;
 using CFEventHandler.Teams;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace CFEventHandler.Services
         private readonly IEventTypeService _eventTypeService;
         private readonly IHTTPSettingsService _httpSettingsService;
         private readonly IProcessSettingsService _processSettingsService;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ISignalRSettingsService _signalRSettingsService;
         private readonly ISMSSettingsService _smsSettingsService;
         private readonly ISQLSettingsService _sqlSettingsService;
@@ -43,6 +45,7 @@ namespace CFEventHandler.Services
                         IEventTypeService eventTypeService,
                         IHTTPSettingsService httpSettingsService,
                         IProcessSettingsService processSettingsService,
+                        IServiceProvider serviceProvider,
                         ISignalRSettingsService signalRSettingsService,
                         ISMSSettingsService smsSettingsService,
                         ISQLSettingsService sqlSettingsService,
@@ -57,6 +60,7 @@ namespace CFEventHandler.Services
             _eventTypeService = eventTypeService;
             _httpSettingsService = httpSettingsService;
             _processSettingsService = processSettingsService;
+            _serviceProvider = serviceProvider;
             _signalRSettingsService = signalRSettingsService;
             _smsSettingsService = smsSettingsService;
             _sqlSettingsService = sqlSettingsService;
@@ -67,32 +71,30 @@ namespace CFEventHandler.Services
         public TenantSeed GetSeedData(int group)
         {
             var tenantSeed = new TenantSeed();
+            
+                    tenantSeed.APIKeys = _serviceProvider.GetRequiredKeyedService<IEntityReader<APIKeyInstance>>($"APIKeySeed{group}");
+                    tenantSeed.ConsoleEventSettings = _serviceProvider.GetRequiredKeyedService<IEntityReader<ConsoleEventSettings>>($"ConsoleEventSettingsSeed{group}");
+                    tenantSeed.DocumentTemplates = _serviceProvider.GetRequiredKeyedService<IEntityReader<DocumentTemplate>>($"DocumentTemplateSeed{group}");
+                    tenantSeed.EmailEventSettings = _serviceProvider.GetRequiredKeyedService<IEntityReader<EmailEventSettings>>($"EmailEventSettingsSeed{group}");
+                    tenantSeed.EventClients = _serviceProvider.GetRequiredKeyedService<IEntityReader<EventClient>>($"EventClientSeed{group}");
+                    tenantSeed.EventHandlerRules = _serviceProvider.GetRequiredKeyedService<IEntityReader<EventHandlerRule>>($"EventHandlerRuleSeed{group}");                    
+                    tenantSeed.EventHandlers = _serviceProvider.GetRequiredKeyedService<IEntityReader<CFEventHandler.Models.EventHandler>>($"EventHandlerSeed{group}");
+                    tenantSeed.EventTypes = _serviceProvider.GetRequiredKeyedService<IEntityReader<EventType>>($"EventTypeSeed{group}");
+                    tenantSeed.HTTPEventSettings = _serviceProvider.GetRequiredKeyedService<IEntityReader<HTTPEventSettings>>($"HTTPEventSettingsSeed{group}");
+                    tenantSeed.ProcessEventSettings = _serviceProvider.GetRequiredKeyedService<IEntityReader<ProcessEventSettings>>($"ProcessEventSettingsSeed{group}");
+                    tenantSeed.SignalREventSettings = _serviceProvider.GetRequiredKeyedService<IEntityReader<SignalREventSettings>>($"SignalREventSettingsSeed{group}");
+                    tenantSeed.SMSEventSettings = _serviceProvider.GetRequiredKeyedService<IEntityReader<SMSEventSettings>>($"SMSEventSettingsSeed{group}");
+                    tenantSeed.SQLEventSettings = _serviceProvider.GetRequiredKeyedService<IEntityReader<SQLEventSettings>>($"SQLEventSettingsSeed{group}");
+                    tenantSeed.TeamsEventSettings = _serviceProvider.GetRequiredKeyedService<IEntityReader<TeamsEventSettings>>($"TeamsEventSettingsSeed{group}");
 
-            switch (group)
-            {
-                case 1:
-                    tenantSeed.APIKeys = new APIKeySeed1(_tenantService);
-                    tenantSeed.ConsoleEventSettings = new ConsoleEventSettingsSeed1();
-                    tenantSeed.CSVEventSettings = new CSVEventSettingsSeed1();
-                    tenantSeed.DocumentTemplates = new DocumentTemplateSeed1();
-                    tenantSeed.EmailEventSettings = new EmailEventSettingsSeed1(_documentTemplateService);
-                    tenantSeed.EventClients = new EventClientSeed1();
-                    tenantSeed.EventHandlerRules = new EventHandlerRuleSeed1(_consoleSettingsService, _csvSettingsService,
+            /*
+            tenantSeed.EventHandlerRules = new EventHandlerRuleSeed1(_consoleSettingsService, _csvSettingsService,
                                         _emailSettingsService, _eventHandlerService,
                                         _eventTypeService, _httpSettingsService,
                                         _processSettingsService, _signalRSettingsService,
                                         _smsSettingsService, _sqlSettingsService,
                                         _teamsSettingsService);
-                    tenantSeed.EventHandlers = new EventHandlerSeed1();
-                    tenantSeed.EventTypes = new EventTypeSeed1();
-                    tenantSeed.HTTPEventSettings = new HTTPEventSettingsSeed1();
-                    tenantSeed.ProcessEventSettings = new ProcessEventSettingsSeed1();
-                    tenantSeed.SignalREventSettings = new SignalREventSettingsSeed1();
-                    tenantSeed.SMSEventSettings = new SMSEventSettingsSeed1();
-                    tenantSeed.SQLEventSettings = new SQLEventSettingsSeed1();
-                    tenantSeed.TeamsEventSettings = new TeamsEventSettingsSeed1();
-                    break;
-            }
+            */
 
             return tenantSeed;
         }

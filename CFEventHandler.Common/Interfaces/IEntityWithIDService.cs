@@ -6,20 +6,20 @@
     /// <typeparam name="TEntityType">Entity</typeparam>
     /// <typeparam name="TIDType">Type of entity Id</typeparam>
     public interface IEntityWithIDService<TEntityType, TIDType>
-    {  
+    {
         /// <summary>
         /// Imports from list
         /// </summary>
-        /// <param name="eventTypeList"></param>
+        /// <param name="entityReader"></param>
         /// <returns></returns>
-        Task ImportAsync(IEntityList<TEntityType> entityList);
+        Task ImportAsync(IEntityReader<TEntityType> entityReader);
 
         /// <summary>
         /// Exports to list
         /// </summary>
-        /// <param name="eventTypeList"></param>
+        /// <param name="entityWriter"></param>
         /// <returns></returns>
-        Task ExportAsync(IEntityList<TEntityType> entityList);
+        Task ExportAsync(IEntityWriter<TEntityType> entityWriter);
 
         /// <summary>
         /// Gets all
@@ -47,6 +47,13 @@
         /// <param name="eventType"></param>
         /// <returns></returns>
         Task<TEntityType> AddAsync(TEntityType entity);
+
+        /// <summary>
+        /// Updates event type
+        /// </summary>
+        /// <param name="eventType"></param>
+        /// <returns></returns>
+        Task<TEntityType> UpdateAsync(TEntityType entity);
 
         /// <summary>
         /// Deletes all event types

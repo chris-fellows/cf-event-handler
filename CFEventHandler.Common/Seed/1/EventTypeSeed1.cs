@@ -6,7 +6,7 @@ namespace CFEventHandler.Seed
     /// <summary>
     /// Event type seed example 1
     /// </summary>
-    public class EventTypeSeed1 : IEntityList<EventType>
+    public class EventTypeSeed1 : IEntityReader<EventType>
     {
         public async Task<List<EventType>> ReadAllAsync()
         {
@@ -43,11 +43,6 @@ namespace CFEventHandler.Seed
             });
 
             return eventTypes;
-        }
-
-        public async Task WriteAllAsync(List<EventType> eventTypes)
-        {
-            // No action            
         }
     }
 }
